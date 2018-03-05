@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>我的博客</title>
+    <link rel="stylesheet" href="/static/style/reset.css">
+    <script>
+        function isObject(object) {
+            return typeof object === 'object' && object !== null
+        }
+        function Ajax(options) {
+            if (!(options && options.url)) {
+                return void 666;
+            }
+            var xhr = new XMLHttpRequest();
+            options.type = options.type ? options.type.toUpperCase() : 'GET';
+
+            if (isObject(options.data)) {
+                var str = '';
+                for (var key in options.data) {
+                    if (!options.data.hasOwnProperty(key)) {
+                        continue;
+                    } else {
+                        str = str + key + '=' + options.data[key] + '&';
+                    }
+                }
+                options.data = str.replace(/&$/, '');
+            }
+
+            if (options.type === 'GET') {
+                if (options.data) {
+                    xhr.open('GET', url + '?' + options.data, true);
+                } else {
+                    xhr.open('GET', url + '?t=' + Date.now(), true);
+                }
+            } else if (options.type === 'POST') {
+                xhr.open('POST', options.url, true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.send(options.data);
+            }
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+                        var type = xhr.getResponseHeader('Content-Type');
+                        if (/json/.test(type)) {
+                            options.success && options.success(JSON.parse(xhr.responseText));
+                        } else {
+                            options.success && options.success(xhr.responseText);
+                        }
+                    } else {
+                        options.error && options.error(xhr.status);
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>

@@ -1,0 +1,34 @@
+<%- include('header') %>
+    <form id="regiterForm" class="ui form segment" method="post" action="/signup/register" enctype="application/x-wwwform-urlencoded">
+        <div class="field required">
+            <label>用户名</label>
+            <input placeholder="用户名" type="text" name="username">
+        </div>
+        <div class="field required">
+            <label>密码</label>
+            <input placeholder="密码" type="password" name="password">
+        </div>
+        <div class="field required">
+            <label>重复密码</label>
+            <input placeholder="重复密码" type="password" name="repassword">
+        </div>
+        <div class="field required">
+            <label>性别</label>
+            <select class="ui compact selection dropdown" name="gender">
+          <option value="m">男</option>
+          <option value="f">女</option>
+          <option value="x">保密</option>
+        </select>
+        </div>
+       <!--  <div class="field required">
+            <label>头像</label>
+            <input type="file" name="avatar">
+        </div> -->
+        <div class="field required">
+            <label>个性签名</label>
+            <textarea name="signature" rows="5"></textarea>
+        </div>
+        <input id="submitButton" type="button" class="ui button fluid" value="注册">
+    </form>
+    <script src="/static/js/signup.js"></script>
+<%- include('footer') %>

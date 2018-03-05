@@ -1,0 +1,46 @@
+<%- include('header') %>
+    <form id="signinForm" method="post" action="/login/login" enctype="application/x-wwwform-urlencoded">
+        <div class="field required">
+            <label>用户名</label>
+            <input placeholder="用户名" type="text" name="username">
+        </div>
+        <div class="field required">
+            <label>密码</label>
+            <input placeholder="密码" type="password" name="password">
+        </div>
+        <input id="submitButton" type="submit" class="ui button fluid" value="登录">
+    </form>
+    <button id="ajaxDemo">请求</button>
+    <script>
+        var regiterForm = document.getElementById('regiterForm');
+        var submitButton = document.getElementById('submitButton');
+
+        submitButton.addEventListener('click', function () {
+            if (regiterForm.username.value === '' || regiterForm.password.value === ''
+                || regiterForm.repassword.value === '') {
+
+            } else if (regiterForm.password.value !== regiterForm.repassword.value) {
+                console.log('密码不一致');
+            } else {
+                Ajax({
+                    url: '/signup/register',
+                    type: 'post',
+                    data: {
+                        username: regiterForm.username.value,
+                        password: regiterForm.password.value,
+                        gender: regiterForm.gender.value,
+                        signature: regiterForm.signature.value
+                    },
+                    success: function (data) {
+                        if (data.code === 302) {
+                            location.href = data.data.url;
+                        } else if (data.code === 1001) {
+                            console.log(data.errorMessage);
+                        }
+                    }
+                })
+            }
+        }, false);
+ 
+    </script>
+    <%- include('footer') %>

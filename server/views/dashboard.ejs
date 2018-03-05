@@ -1,0 +1,39 @@
+<%- include('header') %>
+    <form id="addPost" method="post">
+        <div>
+            <label>标题</label>
+            <input placeholder="文章标题" type="text" name="title">
+        </div>
+        <div>
+            <label>简介</label>
+            <input placeholder="文章简介" type="text" name="summary">
+        </div>
+        <div>
+            <label>内容</label>
+            <textarea name="content" cols="30" rows="10" placeholder="文章内容"></textarea>
+        </div>
+        <input id="submitButton" type="button" value="提交">
+    </form>
+    <script>
+
+        document.getElementById('submitButton').addEventListener('click', function () {
+            var form = document.getElementById('addPost');
+            var title = form.title.value;
+            var summary = form.summary.value;
+            var content = form.content.value;
+            Ajax({
+                url: '/api/post',
+                type: 'POST',
+                data: {
+                    title: title,
+                    summary: summary,
+                    content: content
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        }, false);;
+
+    </script>
+    <%- include('footer') %>

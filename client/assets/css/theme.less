@@ -1,0 +1,227 @@
+@import url('./const');
+.post-title h1 {
+    margin: 0 0 1em;
+    font-size: 36px;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: @fontColorTitle;
+}
+
+.post-content h2,
+.post-content h3,
+.post-content h4,
+.post-content strong {
+    font-weight: 600;
+    color: @fontColorTitle;
+}
+
+.post-content code,
+.post-content pre {
+    font-family: "Roboto Mono", Monaco, courier, monospace;
+    font-size: 0.8em;
+    background-color: #f8f8f8;
+    -webkit-font-smoothing: initial;
+    -moz-osx-font-smoothing: initial;
+}
+
+.post-content code {
+    color: #e96900;
+    padding: 3px 5px;
+    margin: 0 2px;
+    border-radius: 2px;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.post-content em {
+    color: #7f8c8d;
+}
+
+.post-content p {
+    word-spacing: 0.05em;
+    color: @fontColorDescription;
+    font-size: 15px;
+}
+
+.post-content h2,
+.post-content h3 {
+    pointer-events: none;
+}
+
+.post-content h2 a,
+.post-content h3 a,
+.post-content h2 button,
+.post-content h3 button {
+    pointer-events: auto;
+    color: @fontColorTitle;
+}
+
+.post-content h2:before,
+.post-content h3:before {
+    content: "";
+    display: block;
+    margin-top: -91px;
+    height: 91px;
+    visibility: hidden;
+}
+
+.post-content h2 {
+    margin: 45px 0 0.8em;
+    padding-bottom: 0.7em;
+    border-bottom: 1px solid #ddd;
+    font-size: 20px;
+}
+
+.post-content h3 {
+    margin: 52px 0 1.2em;
+    position: relative;
+    font-size: 18px;
+}
+
+.post-content h3:after {
+    content: "#";
+    color: #42b983;
+    position: absolute;
+    left: -0.8em;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.post-content figure {
+    margin: 1.2em 0;
+}
+
+.post-content p,
+.post-content ul,
+.post-content ol {
+    line-height: 1.6em;
+    margin: 1.2em 0 -1.2em;
+    padding-bottom: 1.2em;
+    position: relative;
+    z-index: 1;
+}
+
+.post-content ul,
+.post-content ol {
+    padding-left: 1.5em;
+    position: inherit;
+}
+
+.post-content a {
+    color: #42b983;
+    font-weight: 600;
+}
+
+.post-content blockquote {
+    margin: 2em 0;
+    padding-left: 20px;
+    border-left: 4px solid #42b983;
+}
+
+.post-content blockquote p {
+    font-weight: 600;
+    margin-left: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.post-content iframe {
+    margin: 1em 0;
+}
+
+.post-content>table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    margin: 1.2em auto;
+    padding: 0;
+    display: block;
+    overflow-x: auto;
+}
+
+.post-content>table td,
+.post-content>table th {
+    line-height: 1.5em;
+    padding: 0.4em 0.8em;
+    border: none;
+    border: 1px solid #ddd;
+}
+
+.post-content>table th {
+    font-weight: bold;
+    text-align: left;
+}
+
+.post-content>table th,
+.post-content>table tr:nth-child(2n) {
+    background-color: #f8f8f8;
+}
+
+.post-content>table th code,
+.post-content>table tr:nth-child(2n) code {
+    background-color: #efefef;
+}
+
+.post-content p.tip,
+.post-content p.success {
+    padding: 12px 24px 12px 30px;
+    margin: 2em 0;
+    border-left-width: 4px;
+    border-left-style: solid;
+    background-color: #f8f8f8;
+    position: relative;
+    border-bottom-right-radius: 2px;
+    border-top-right-radius: 2px;
+}
+
+.post-content p.tip:before,
+.post-content p.success:before {
+    position: absolute;
+    top: 14px;
+    left: -12px;
+    color: #fff;
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    font-family: "Dosis", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+}
+
+.post-content p.tip code,
+.post-content p.success code {
+    background-color: #efefef;
+}
+
+.post-content p.tip em,
+.post-content p.success em {
+    color: #34495e;
+}
+
+.post-content p.tip {
+    border-left-color: #f66;
+}
+
+.post-content p.tip:before {
+    content: "!";
+    background-color: #f66;
+}
+
+.post-content p.success {
+    border-left-color: #42b983;
+}
+
+.post-content p.success:before {
+    font-family: 'icomoon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: "\f00c";
+    background-color: #42b983;
+}
