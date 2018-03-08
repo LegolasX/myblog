@@ -1,23 +1,31 @@
 const path = require('path');
 const express = require('express');
+const fs = require('fs');
+const vueServerRender = require('vue-server-renderer');
+const chalk = require('chalk');
 const app = express();
 
-// 开发配置
-const webpack = require('webpack');
-const devMiddleware = require('webpack-dev-middleware');
-const hotMiddleware = require('webpack-hot-middleware');
-const clientConfig = require('../build/webpack.dev.config');
-const compiler = webpack(clientConfig);
-
-app.use(devMiddleware(compiler, {
-    publicPath: clientConfig.output.publicPath,
-    quiet: true
-}));
-
-app.use(hotMiddleware(compiler, {
-    log: false,
-    heartbeat: 2000
-}));
+// 开发模式
+const isProd = process.env.NODE_ENV === 'production';
+let bundleRenderer;
+let readyPromise;
+if (isProd) {
+    let serverBundle = require('./vue-ssr-server-bundle.json');
+    const renderOption = {
+        runInNewContext: false,
+        template: fs.readFileSync(path.resolve(__dirname, './index.template.html'), 'utf-8')
+    }
+    bundleRenderer = vueServerRender.createBundleRenderer(serverBundle, renderOption);
+    readyPromise = Promise.resolve();
+} else {
+    let templatePath = path.resolve(__dirname, './index.template.html')
+    readyPromise = require('../build/devServer.js')(app, templatePath, (serverBundle, renderOption) => {
+        if (serverBundle) {
+            bundleRenderer = vueServerRender.createBundleRenderer(serverBundle, renderOption);
+            console.log(chalk.green('[ webpack.server.js ]: bundleRenderer update'));
+        }
+    })
+}
 
 // 业务中间件
 const session = require('express-session');
@@ -81,16 +89,46 @@ app.all('*', function (req, res, next) {
 });
 
 app.get('*', (req, res) => {
-    console.log(req.url);
-    //normalRender(req, res);
-    bundleRender(req, res);
+    console.log(chalk.yellow('[ request url ]: ' + req.url));
+    // bundleRender(req, res);
+    readyPromise.then(() => {
+        bundleRender(req, res);
+    })
+
 });
 
+function bundleRender (req, res) {
+    // const clientManifest = require('../static/dist/vue-ssr-client-manifest.json');
+    const clientBundleFileUlr = '/static/dist/bundle.client.js';
+
+    const context = {
+        url: req.url,
+        title: 'vue 服务端渲染实践',
+        clientBundleUrl: clientBundleFileUlr
+    };
+
+    bundleRenderer.renderToString(context, (err, html) => {
+        if (err) {
+            console.log(err);
+            res.status(500).end('Internal Server Error');
+            return ;
+        } else {
+            res.status(200).end(html)
+        }
+    });
+}
+
+app.listen(3030, function () {
+    console.log('server is starting at port 3030');
+});
+
+
+
+
 function normalRender (req, res) {
-    
     const serverBundle = require('../static/dist/bundle.server.js');
     const createVueInstance = serverBundle.default;
-    const renderer = require('vue-server-renderer').createRenderer({
+    const renderer = vueServerRender.createRenderer({
         template: require('fs').readFileSync(path.resolve(__dirname, './index.template.html'), 'utf-8')
     })
     const context = {
@@ -121,35 +159,3 @@ function normalRender (req, res) {
         console.log(onReject);
     }); 
 }
-
-function bundleRender (req, res) {
-    const clientManifest = require('../static/dist/vue-ssr-client-manifest.json');
-    const serverBundle = require('../static/dist/vue-ssr-server-bundle.json');
-    const renderOption = {
-        runInNewContext: false,
-        template: require('fs').readFileSync(path.resolve(__dirname, './index.template.html'), 'utf-8')
-    };
-
-    const renderer = require('vue-server-renderer').createBundleRenderer(serverBundle, renderOption);
-    const clientBundleFileUlr = '/static/dist/bundle.client.js';
-
-    const context = {
-        url: req.url,
-        title: 'vue 服务端渲染实践',
-        clientBundleUrl: renderOption.clientManifest ? '' : clientBundleFileUlr
-    };
-
-    renderer.renderToString(context, (err, html) => {
-        if (err) {
-            console.log(err);
-            res.status(500).end('Internal Server Error');
-            return ;
-        } else {
-            res.status(200).end(html)
-        }
-    });
-}
-
-app.listen(3030, function () {
-    console.log('server is starting at port 3030');
-});

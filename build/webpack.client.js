@@ -4,7 +4,7 @@ const baseConfig = require('./webpack.base.config');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const vueSSRClientPlugin = require('vue-server-renderer/client-plugin');
 
-module.exports = Object.assign(baseConfig, {
+module.exports = Object.assign({}, baseConfig, {
     entry: {
         app: [path.resolve(__dirname, '../client/client-entry.js')]
     },

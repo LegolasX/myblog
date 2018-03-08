@@ -3,7 +3,7 @@ const baseConfig = require('./webpack.base.config');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
-module.exports = Object.assign(baseConfig, {
+module.exports = Object.assign({}, baseConfig, {
     entry: {
         app: [path.resolve(__dirname, '../client/client-entry.js'), 'webpack-hot-middleware/client?noInfo=true&reload=true']
     },
@@ -15,13 +15,6 @@ module.exports = Object.assign(baseConfig, {
         filename: 'bundle.client.js'
     },
     plugins: [
-        /* new HTMLWebpackPlugin({
-            // 这个是相对项目目录
-            template: 'index.html',
-            // 这个输出文件相对于output.publishPath
-            filename: 'index.html',
-            title: 'webpack-dev-middleware'
-        }), */
         new webpack.BannerPlugin('dev middleware' + new Date().getFullYear() + '年' + parseInt(new Date().getMonth() + 1, 10) + '月' + new Date().getDate() + '日' + new Date().getHours() + '点' + new Date().getMinutes() + '分' + '编译'),
         new webpack.HotModuleReplacementPlugin()
     ]

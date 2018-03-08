@@ -8,7 +8,10 @@ export default context => {
         // 路由加载完毕后再开始解析路由对应的组件
         router.onReady(() => {
             const matchedComponents = router.getMatchedComponents();
-            console.log('matchedComponents:', matchedComponents);
+            console.log('matchedComponents:');
+            matchedComponents.forEach(component => {
+                console.log(component.__file);
+            });
             if (!matchedComponents.length) {
                 reject({
                     code: 404
@@ -24,8 +27,8 @@ export default context => {
                     // 数据取回来了,把数据传给context,这样服务端渲染模板的时候可以把数据打进去
                     context.state = store.state;
                     resolve(app);
-                }, () => {
-                    console.log('asyncData rejected');
+                }, (info) => {
+                    console.log('asyncData rejected:', info);
                 }).catch(reject.bind(this, {
                     code: 100001,
                     message: 'server-entry error'

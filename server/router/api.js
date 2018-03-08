@@ -72,7 +72,6 @@ router.get('/postList/:username', CORS, function (req, res, next) {
             });
             return Promise.all(promiseList);
         }).then(dataArray => {
-            console.log(dataArray);
             postList.forEach((post, index) => {
                 post.commentCount = dataArray[index].length;
             });
@@ -123,7 +122,6 @@ router.post('/comment', CORS, function (req, res, next) {
             });
         }
     }, rejected => {
-        console.log(rejected);
         console.log('rejected');
     })
 })

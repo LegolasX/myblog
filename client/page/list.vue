@@ -19,7 +19,6 @@
 
     export default {
         asyncData({ store, router }) {
-            console.log(router.currentRoute);
             let username = 'ecizep';
             if (router.currentRoute.name === 'userlist') {
                 username = router.currentRoute.params.username;
