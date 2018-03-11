@@ -9,16 +9,18 @@ const app = express();
 const isProd = process.env.NODE_ENV === 'production';
 let bundleRenderer;
 let readyPromise;
+let templatePath = path.resolve(__dirname, './index.template.html')
 if (isProd) {
+    // 生产环境
     let serverBundle = require('./vue-ssr-server-bundle.json');
     const renderOption = {
         runInNewContext: false,
-        template: fs.readFileSync(path.resolve(__dirname, './index.template.html'), 'utf-8')
+        template: fs.readFileSync(templatePath, 'utf-8')
     }
     bundleRenderer = vueServerRender.createBundleRenderer(serverBundle, renderOption);
     readyPromise = Promise.resolve();
 } else {
-    let templatePath = path.resolve(__dirname, './index.template.html')
+    // 开发环境
     readyPromise = require('../build/devServer.js')(app, templatePath, (serverBundle, renderOption) => {
         if (serverBundle) {
             bundleRenderer = vueServerRender.createBundleRenderer(serverBundle, renderOption);

@@ -11,7 +11,7 @@ module.exports = Object.assign({}, baseConfig, {
     output: {
         libraryTarget: 'commonjs2',
         path: path.resolve(__dirname, '../server'),
-        publicPath: '//localhost:3030/static/dist/',
+        publicPath: '//140.143.164.218:3030//static/dist/',
         filename: 'bundle.server.js'
     },
     plugins: [

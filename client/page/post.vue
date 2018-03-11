@@ -23,7 +23,7 @@
                 <header>
                     <img src="../assets/images/none.png" alt="">
                     <div class="comment_user">
-                        <input type="text" placeholder="点击此处输入你的称呼" name="nickname" v-model="userInfo.nickname">
+                        <input type="text" placeholder="点击输入昵称" name="nickname" v-model="userInfo.nickname">
                         <input type="hidden" name="position" :value="position">
                         <p>在{{position}}说：</p>
                     </div>

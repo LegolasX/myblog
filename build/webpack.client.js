@@ -10,7 +10,7 @@ module.exports = Object.assign({}, baseConfig, {
     },
     output: {
         path: path.resolve(__dirname, '../static/dist'),
-        publicPath: '//localhost:3030/static/dist/',
+        publicPath: '//140.143.164.218:3030/static/dist/',
         filename: 'bundle.client.js'
     },
     plugins: [
