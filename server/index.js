@@ -13,9 +13,23 @@ let templatePath = path.resolve(__dirname, './index.template.html')
 if (isProd) {
     // 生产环境
     let serverBundle = require('./vue-ssr-server-bundle.json');
+    let clientManifest = JSON.parse(fs.readFileSync(path.resolve(__dirname, './vue-ssr-client-manifest.json')));
     const renderOption = {
         runInNewContext: false,
-        template: fs.readFileSync(templatePath, 'utf-8')
+        template: fs.readFileSync(templatePath, 'utf-8'),
+        clientManifest,
+        // 预加载资源控制
+        shouldPreload: (file, type) => {
+            if (type === 'script') {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        // 预取资源控制
+        shouldPrefetch: (file, type) => {
+            return false
+        }
     }
     bundleRenderer = vueServerRender.createBundleRenderer(serverBundle, renderOption);
     readyPromise = Promise.resolve();
@@ -101,7 +115,7 @@ app.get('*', (req, res) => {
 
 function bundleRender (req, res) {
     // const clientManifest = require('../static/dist/vue-ssr-client-manifest.json');
-    const clientBundleFileUlr = '/static/dist/bundle.client.js';
+    const clientBundleFileUlr = '/static/dist/app.client.js';
 
     const context = {
         url: req.url,

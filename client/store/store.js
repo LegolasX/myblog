@@ -2,6 +2,11 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 
+/* import {
+    getPostList,
+    getPostById
+} from '../api/api.js' */
+
 export function createStore() {
     return new Vuex.Store({
         state: {
@@ -18,6 +23,7 @@ export function createStore() {
         },
         actions: {
             getListOnServer ({commit}, username) {
+                
                 return axios.get('http://localhost:3030/api/postList/' + username).then(res => {
                     console.log('server request postList ' + username);
                     commit('setList', res.data.data);

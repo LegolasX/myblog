@@ -28,9 +28,6 @@
         data() {
             return {}
         },
-        created() {
-
-        },
         mounted() {
             if (this.postList.length === 0) {
                 let username = 'ecizep';

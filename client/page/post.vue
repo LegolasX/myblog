@@ -90,6 +90,7 @@
         cancelVoteOrDislike,
         replyComment
     } from '../api/api';
+    import storageManager from '../util/storage';
 
     export default {
         asyncData({
@@ -120,6 +121,7 @@
             }
         },
         mounted() {
+            this.storageManager = storageManager;
             this.replyFormFragment =  document.createDocumentFragment();
             if (!this.post.title) {
                 getPostById(this.$route.params.postId).then(res => {
@@ -154,12 +156,9 @@
             },
             getComments () {
                 // 获取评论数据及其状态
-                Promise.all([getCommentList(this.$route.params.postId),
-                    import ('../util/storage.js')
-                ]).then(([res, exports]) => {
+                getCommentList(this.$route.params.postId).then(res => {
                     if (res.data.code === 200) {
                         this.commentList = res.data.data;
-                        this.storageManager = exports.default;
                         this.storageManager.init();
                         this.commentList.forEach(comment => {
                             comment.voteCount = comment.voteCount || 0;

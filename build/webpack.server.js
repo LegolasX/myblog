@@ -2,8 +2,10 @@ const path = require('path');
 const webpack = require('webpack');
 const baseConfig = require('./webpack.base.config');
 const vueSSRServerPlugin = require('vue-server-renderer/server-plugin');
+const isProd = process.env.NODE_ENV === 'production';
+const config = require('./config');
 
-module.exports = Object.assign({}, baseConfig, {
+serverBundleConfig = Object.assign({}, baseConfig, {
     target: 'node',
     entry: {
         app: ['./client/server-entry.js']
@@ -11,11 +13,16 @@ module.exports = Object.assign({}, baseConfig, {
     output: {
         libraryTarget: 'commonjs2',
         path: path.resolve(__dirname, '../server'),
-        publicPath: '//140.143.164.218:3030//static/dist/',
-        filename: 'bundle.server.js'
+        publicPath: isProd ? config.production.publicPath : config.dev.publicPath,
+        filename: '[name].server.js'
     },
     plugins: [
         new webpack.BannerPlugin(new Date().getFullYear() + '年' + parseInt(new Date().getMonth() + 1, 10) + '月' + new Date().getDate() + '日' + new Date().getHours() + '点' + new Date().getMinutes() + '分' + '编译'),
+        new webpack.DefinePlugin({
+            PRODUCTION: isProd ? JSON.stringify('true') : JSON.stringify('false'),
+        }),
         new vueSSRServerPlugin()
     ]
 })
+
+module.exports = serverBundleConfig
