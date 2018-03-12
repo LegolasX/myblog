@@ -26,7 +26,7 @@ clientConfig = Object.assign({}, baseConfig, {
             minchunks: 2
         }),
         new vueSSRClientPlugin({
-            clientManifestPath: path.resolve(__dirname, '../server/')
+            clientManifestPath: path.resolve(__dirname, '../server/dist')
         })
     ]
 });

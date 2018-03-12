@@ -12,8 +12,8 @@ let readyPromise;
 let templatePath = path.resolve(__dirname, './index.template.html')
 if (isProd) {
     // 生产环境
-    let serverBundle = require('./vue-ssr-server-bundle.json');
-    let clientManifest = JSON.parse(fs.readFileSync(path.resolve(__dirname, './vue-ssr-client-manifest.json')));
+    let serverBundle = require('./dist/vue-ssr-server-bundle.json');
+    let clientManifest = JSON.parse(fs.readFileSync(path.resolve(__dirname, './dist/vue-ssr-client-manifest.json')));
     const renderOption = {
         runInNewContext: false,
         template: fs.readFileSync(templatePath, 'utf-8'),
@@ -81,8 +81,7 @@ app.use(session({
     // 设置为 false，强制创建一个 session，即使用户未登录
     saveUninitialized: false,
     cookie: {
-        maxAge: config.session.maxAge,
-        domain: 'ecizep.com'
+        maxAge: config.session.maxAge
     }
 }));
 

@@ -12,7 +12,7 @@ serverBundleConfig = Object.assign({}, baseConfig, {
     },
     output: {
         libraryTarget: 'commonjs2',
-        path: path.resolve(__dirname, '../server'),
+        path: path.resolve(__dirname, '../server/dist'),
         publicPath: isProd ? config.production.publicPath : config.dev.publicPath,
         filename: '[name].[hash:8].server.js'
     },
