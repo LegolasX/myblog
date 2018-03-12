@@ -14,7 +14,7 @@ clientConfig = Object.assign({}, baseConfig, {
     output: {
         path: path.resolve(__dirname, '../static/dist'),
         publicPath: isProd ? config.production.publicPath : config.dev.publicPath,
-        filename: '[name].client.js'
+        filename: '[name].[hash:8].client.js'
     },
     plugins: [
         new webpack.BannerPlugin(new Date().getFullYear() + '年' + parseInt(new Date().getMonth() + 1, 10) + '月' + new Date().getDate() + '日' + new Date().getHours() + '点' + new Date().getMinutes() + '分' + '编译'),

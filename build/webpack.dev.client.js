@@ -14,7 +14,7 @@ module.exports = Object.assign({}, baseConfig, {
         path:  path.resolve(__dirname, '../static/dist'),
         // 文件中Url的网络路径
         publicPath: config.dev.publicPath,
-        filename: '[name].client.js'
+        filename: '[name].[hash:8].client.js'
     },
     plugins: [
         new webpack.BannerPlugin('dev middleware' + new Date().getFullYear() + '年' + parseInt(new Date().getMonth() + 1, 10) + '月' + new Date().getDate() + '日' + new Date().getHours() + '点' + new Date().getMinutes() + '分' + '编译'),

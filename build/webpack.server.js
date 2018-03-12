@@ -14,7 +14,7 @@ serverBundleConfig = Object.assign({}, baseConfig, {
         libraryTarget: 'commonjs2',
         path: path.resolve(__dirname, '../server'),
         publicPath: isProd ? config.production.publicPath : config.dev.publicPath,
-        filename: '[name].server.js'
+        filename: '[name].[hash:8].server.js'
     },
     plugins: [
         new webpack.BannerPlugin(new Date().getFullYear() + '年' + parseInt(new Date().getMonth() + 1, 10) + '月' + new Date().getDate() + '日' + new Date().getHours() + '点' + new Date().getMinutes() + '分' + '编译'),
