@@ -12,8 +12,8 @@ let readyPromise;
 let templatePath = path.resolve(__dirname, './index.template.html')
 if (isProd) {
     // 生产环境
-    let serverBundle = require('./dist/vue-ssr-server-bundle.json');
-    let clientManifest = JSON.parse(fs.readFileSync(path.resolve(__dirname, './dist/vue-ssr-client-manifest.json')));
+    let serverBundle = require('../static/client/vue-ssr-server-bundle.json');
+    let clientManifest = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../static/client/vue-ssr-client-manifest.json')));
     const renderOption = {
         runInNewContext: false,
         template: fs.readFileSync(templatePath, 'utf-8'),
@@ -90,7 +90,7 @@ const dashboardRouter = require('./router/dashboard');
 const signinRouter = require('./router/signin');
 const apiRouter = require('./router/api');
 
-app.use('/dashboard', checklogin, dashboardRouter);
+app.use('/dashboard', dashboardRouter);
 app.use('/login', signinRouter);
 app.use('/api', apiRouter);
 
@@ -103,7 +103,7 @@ app.all('*', function (req, res, next) {
     next();
 });
 
-app.get('*', (req, res) => {
+app.get('*', (req, res, next) => {
     console.log(chalk.yellow('[ request url ]: ' + req.url));
     // bundleRender(req, res);
     readyPromise.then(() => {
@@ -113,13 +113,10 @@ app.get('*', (req, res) => {
 });
 
 function bundleRender (req, res) {
-    // const clientManifest = require('../static/dist/vue-ssr-client-manifest.json');
-    const clientBundleFileUlr = '/static/dist/app.client.js';
 
     const context = {
         url: req.url,
-        title: 'vue 服务端渲染实践',
-        clientBundleUrl: clientBundleFileUlr
+        title: 'vue 服务端渲染实践'
     };
 
     bundleRenderer.renderToString(context, (err, html) => {

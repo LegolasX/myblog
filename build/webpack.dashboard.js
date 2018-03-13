@@ -1,23 +1,23 @@
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const baseConfig = require('./webpack.base.config');
-const vueSSRClientPlugin = require('./vur-server-renderer-client-plugin');
 const config = require('./config.js');
 const isProd =  process.env.NODE_ENV === 'production';
 
 clientConfig = Object.assign({}, baseConfig, {
     entry: {
-        app: [path.resolve(__dirname, '../client/client-entry.js')],
-        vendor: ['vue', 'vue-router', 'vuex', 'axios']
+        dashboard: [path.resolve(__dirname, '../dashboard/app.js')],
+        vendor: ['vue', 'vue-router', 'axios']
     },
     output: {
-        path: config.client.path,
-        publicPath: isProd ? config.client.production.publicPath : config.client.dev.publicPath,
+        path: config.dashboard.path,
+        publicPath: isProd ? config.dashboard.production.publicPath : config.dashboard.dev.publicPath,
         filename: '[name].[hash:8].client.js'
     },
     plugins: [
-        new CleanWebpackPlugin(path.resolve(__dirname, '../static/client/'), {
+        new CleanWebpackPlugin(path.resolve(__dirname, '../static/dashboard/'), {
             root: path.resolve(__dirname, '../../myblog/'),
             verbose: true, 
             dry: false
@@ -30,7 +30,10 @@ clientConfig = Object.assign({}, baseConfig, {
             name: 'vendor',
             minchunks: 2
         }),
-        new vueSSRClientPlugin()
+        new HtmlWebpackPlugin({
+            template: path.resolve(__dirname, '../server/dashboard.template.html'),
+            filename: path.resolve(__dirname, '../server/dashboard.html')
+        })
     ]
 });
 

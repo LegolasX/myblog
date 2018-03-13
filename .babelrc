@@ -4,7 +4,7 @@
             "targets": {
                 "browsers": ["last 2 versions", "safari >= 7", "IE >= 10", "android > 4.3", "ios >= 9"]
             },
-            "debug": true,
+            "debug": false,
             "useBuiltIns": "usage"
         }]
     ],

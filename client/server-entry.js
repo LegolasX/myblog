@@ -8,8 +8,9 @@ export default context => {
         // 路由加载完毕后再开始解析路由对应的组件
         router.onReady(() => {
             const matchedComponents = router.getMatchedComponents();
-            console.log('matchedComponents:');
+            console.log('matchedComponents length:' + matchedComponents.length);
             matchedComponents.forEach(component => {
+                console.log(component);
                 console.log(component.__file);
             });
             if (!matchedComponents.length) {

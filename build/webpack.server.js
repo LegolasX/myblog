@@ -8,12 +8,13 @@ const config = require('./config');
 serverBundleConfig = Object.assign({}, baseConfig, {
     target: 'node',
     entry: {
-        app: ['./client/server-entry.js']
+        app: ['./client/server-entry.js'],
+        vendor: ['vue', 'vue-router', 'vuex', 'axios']
     },
     output: {
         libraryTarget: 'commonjs2',
-        path: path.resolve(__dirname, '../server/dist'),
-        publicPath: isProd ? config.production.publicPath : config.dev.publicPath,
+        path: config.client.path,
+        publicPath: isProd ? config.client.production.publicPath : config.client.dev.publicPath,
         filename: '[name].[hash:8].server.js'
     },
     plugins: [

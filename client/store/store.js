@@ -23,7 +23,6 @@ export function createStore() {
         },
         actions: {
             getListOnServer ({commit}, username) {
-                
                 return axios.get('http://localhost:3030/api/postList/' + username).then(res => {
                     console.log('server request postList ' + username);
                     commit('setList', res.data.data);

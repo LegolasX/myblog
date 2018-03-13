@@ -1,20 +1,20 @@
 const webpack = require('webpack');
 const baseConfig = require('./webpack.base.config');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
-const vueSSRClientPlugin = require('vue-server-renderer/client-plugin');
 const config = require('./config');
 
 module.exports = Object.assign({}, baseConfig, {
     entry: {
-        app: [path.resolve(__dirname, '../client/client-entry.js')],
-        vendor: ['vue', 'vue-router', 'vuex', 'axios',  'webpack-hot-middleware/client?path=/__client_hmr&noInfo=true&reload=true']
+        dashboard: [path.resolve(__dirname, '../dashboard/app.js'), 'webpack-hot-middleware/client?path=/__dashboard_hmr&reload=true'],
+        vendor: ['vue', 'vue-router', 'axios']
     },
     output: {
         // js文件编译输出目录
-        path:  config.client.path,
+        path:  path.resolve(__dirname, '../dashboard'),
         // 文件中Url的网络路径
-        publicPath: config.client.dev.publicPath,
-        filename: '[name].[hash:8].client.js'
+        publicPath: '/dashboard',
+        filename: '[name].[hash:8].dashboard.js'
     },
     plugins: [
         new webpack.BannerPlugin('dev middleware' + new Date().getFullYear() + '年' + parseInt(new Date().getMonth() + 1, 10) + '月' + new Date().getDate() + '日' + new Date().getHours() + '点' + new Date().getMinutes() + '分' + '编译'),
@@ -25,7 +25,10 @@ module.exports = Object.assign({}, baseConfig, {
             name: 'vendor',
             minchunks: 2
         }),
-        new webpack.HotModuleReplacementPlugin(),
-        new vueSSRClientPlugin()
+        new HtmlWebpackPlugin({
+            template: path.resolve(__dirname, '../server/dashboard.template.html'),
+            filename: 'index.html'
+        }),
+        new webpack.HotModuleReplacementPlugin()
     ]
 });

@@ -1,6 +1,7 @@
 node_modules
 test
 dist
+static/client
+static/dashboard
 .DS_Store
-server/vue-ssr-client-manifest.json
-server/vue-ssr-server-bundle.json
+server/dist

@@ -5,6 +5,7 @@ const devMiddleware = require('webpack-dev-middleware');
 const hotMiddleware = require('webpack-hot-middleware');
 const clientConfig = require('../build/webpack.dev.client');
 const serverConfig = require('../build/webpack.server.js');
+const dashboardConfig = require('../build/webpack.dashboard.dev.js');
 const MemoryFileSystem = require('memory-fs');
 const chalk = require('chalk');
 const chokidar = require('chokidar');
@@ -53,6 +54,8 @@ module.exports = function devServer (app, templatePath, updateBundleRenderer) {
     const clientComplier = webpack(clientConfig);
 
     const devMiddlewareServer = devMiddleware(clientComplier, {
+        // webpack 将静态资源输出到dev middleware里面的内存文件系统
+        // 将静态资源服务映射到 dev middleware 内存文件系统
         publicPath: clientConfig.output.publicPath,
         quiet: true
     });
@@ -70,8 +73,25 @@ module.exports = function devServer (app, templatePath, updateBundleRenderer) {
     })
 
     app.use(hotMiddleware(clientComplier, {
+        // 需要和clientConfig里面的path保持一致
+        path: '/__client_hmr',
         heartbeat: 2000
     }));
+
+    // dashboard bundle hot-reload
+    const dashboardComplier = webpack(dashboardConfig);
+
+    app.use(devMiddleware(dashboardComplier, {
+        publicPath: dashboardConfig.output.publicPath,
+        quiet: true
+    }));
+
+    app.use(hotMiddleware(dashboardComplier, {
+        // 保持一致
+        path: '/__dashboard_hmr',
+        heartbeat: 2000
+    }));
+
 
     // server bundle hot-reload
     const serverComplier = webpack(serverConfig);
