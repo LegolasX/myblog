@@ -9,10 +9,6 @@ export default context => {
         router.onReady(() => {
             const matchedComponents = router.getMatchedComponents();
             console.log('matchedComponents length:' + matchedComponents.length);
-            matchedComponents.forEach(component => {
-                console.log(component);
-                console.log(component.__file);
-            });
             if (!matchedComponents.length) {
                 reject({
                     code: 404

@@ -11,6 +11,8 @@
     "plugins": [
         ["@babel/plugin-transform-runtime", {
             "hlepers": false
-        }], "@babel/plugin-syntax-dynamic-import"
+        }], 
+        "@babel/plugin-syntax-dynamic-import",
+        "@babel/plugin-proposal-object-rest-spread"
     ]
 }

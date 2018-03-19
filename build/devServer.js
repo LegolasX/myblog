@@ -5,7 +5,7 @@ const devMiddleware = require('webpack-dev-middleware');
 const hotMiddleware = require('webpack-hot-middleware');
 const clientConfig = require('../build/webpack.dev.client');
 const serverConfig = require('../build/webpack.server.js');
-const dashboardConfig = require('../build/webpack.dashboard.dev.js');
+const dashboardConfig = require('../build/webpack.dev.dashboard.js');
 const MemoryFileSystem = require('memory-fs');
 const chalk = require('chalk');
 const chokidar = require('chokidar');
@@ -24,13 +24,14 @@ module.exports = function devServer (app, templatePath, updateBundleRenderer) {
     let readyPromise = new Promise(resolve => {
         readyResolve = resolve;
     })
-    let serverBundle;
+    let serverBundle,
+        clientManifest;
     const renderOption = {
         runInNewContext: false
     };
 
     update = () => {
-        if (serverBundle) {
+        if (serverBundle && clientManifest) {
             readyResolve();
             updateBundleRenderer(serverBundle, {
                 runInNewContext: false,

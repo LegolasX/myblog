@@ -2,8 +2,39 @@ const express = require('express');
 const router = express.Router();
 const posts = require('../models/posts');
 const comments = require('../models/comments');
+const User = require('../models/users');
 const CORS = require('../middleware/cors');
 const marked = require('marked');
+
+const dashboardRouter = require('./dashboard');
+const checkLogin = require('../middleware/checklogin');
+
+// 后台需要验证登录的接口
+router.use('/dashboard', checkLogin, dashboardRouter);
+
+
+/* 
+    登录注册相关
+*/
+router.post('/login', function (req, res, next) {
+    console.log(req.body);
+    User.login(req.body).then((result) => {
+        if (result) {
+            req.session.username = req.body.username;
+            res.json({
+                code: 200,
+                message: 'login success',
+                data: null
+            });
+        } else {
+            res.json({
+                code: 204,
+                message: 'login failed',
+                data: null
+            });
+        }
+    })
+})
 
 /* 
     post

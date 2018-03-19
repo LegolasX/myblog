@@ -48,7 +48,6 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const CORS = require('./middleware/cors');
-const checklogin = require('./util/checklogin');
 const config = require('./config/default');
 
 // 设置模板引擎
@@ -86,13 +85,14 @@ app.use(session({
 }));
 
 // 设置路由
-const dashboardRouter = require('./router/dashboard');
-const signinRouter = require('./router/signin');
 const apiRouter = require('./router/api');
 
-app.use('/dashboard', dashboardRouter);
-app.use('/login', signinRouter);
 app.use('/api', apiRouter);
+app.use('/dashboard',  function (req, res, next) {
+    console.log(req.url);
+    res.setHeader('Content-Type', 'text/html');
+    res.sendFile(path.resolve(__dirname, './dashboard.html'));
+});
 
 let ECIZEP_ID = 1;
 app.all('*', function (req, res, next) {
@@ -133,41 +133,3 @@ function bundleRender (req, res) {
 app.listen(3030, function () {
     console.log('server is starting at port 3030');
 });
-
-
-
-
-function normalRender (req, res) {
-    const serverBundle = require('../static/dist/bundle.server.js');
-    const createVueInstance = serverBundle.default;
-    const renderer = vueServerRender.createRenderer({
-        template: require('fs').readFileSync(path.resolve(__dirname, './index.template.html'), 'utf-8')
-    })
-    const context = {
-        url: req.url
-    };
-    const templateData = {
-        title: 'vue 服务端渲染实践',
-        clientBundleUrl: '/static/dist/bundle.client.js'
-    }
-
-    createVueInstance(context).then(vueInstance => {
-        if (vueInstance.code === 404) {
-            console.log('cannot find router');
-        } else {
-            // 此时store里面预请求的数据已经被存入context.state了,打入模板数据里
-            templateData.state = context.state;
-            renderer.renderToString(vueInstance, templateData, (err, html) => {
-                if (err) {
-                    console.log(err);
-                    res.status(500).end('Internal Server Error');
-                    return ;
-                } else {
-                    res.status(200).end(html)
-                }
-            })
-        }
-    }, (onReject) => {
-        console.log(onReject);
-    }); 
-}

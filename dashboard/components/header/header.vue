@@ -1,0 +1,112 @@
+<template>
+        <header class="dash_header">
+            <div class="user_wrapper">
+                <div class="avatar_border"></div>
+                <img src="../../assets/images/avatar.jpg" alt="" class="avatar">
+                <h3>Smantha William</h3>
+                <p>Life is beautiful when you realize ite. Grateful for It.</p>
+            </div>
+            <div class="category_wrapper">
+                <mu-list>
+                    <mu-list-item title="Moments" :class="{active: tabIndex === 0}" @click="changeTab(0)">
+                        <span class="icon-instagram" slot="left" style="font-size: 125%"></span>
+                        <span slot="right">20</span>
+                    </mu-list-item>
+                    <mu-list-item title="Article"  :class="{active: tabIndex === 1}" @click="changeTab(1)">
+                        <span class="icon-paper-plane" slot="left"></span>
+                        <span slot="right">40</span>
+                    </mu-list-item>
+                    <mu-list-item title="Photos"  :class="{active: tabIndex === 2}" @click="changeTab(2)">
+                        <span class="icon-image" slot="left"></span>
+                        <span slot="right">34</span>
+                    </mu-list-item>
+                    <mu-list-item title="Settings"  :class="{active: tabIndex === 3}" @click="changeTab(3)">
+                        <span class="icon-cogs" slot="left"></span>
+                        <span slot="right">19</span>
+                    </mu-list-item>
+                </mu-list>
+            </div>
+        </header>
+</template>
+<script>
+    import muList from 'muse-ui/src/list/list';
+    import muListItem from 'muse-ui/src/list/listItem';
+
+    export default {
+        props: {
+            tabIndex: {
+                default: 0
+            }
+        },
+        data() {
+            return {
+                inProgress: false
+            }
+        },
+        methods: {
+            changeTab (tabIndex) {
+                this.$emit('changeTab', tabIndex);
+            }
+        },
+        components: {
+            muList,
+            muListItem
+        }
+    }
+</script>
+<style lang="less">
+    .dash_header {
+        position: absolute;
+        width: 300px;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        background-color: white;
+        box-shadow: 0 2px 2px rgba(0, 0, 0, 0.05), 0 15px 100px 0 rgba(0, 0, 75, 0.125);
+        .user_wrapper {
+            color: white;
+            text-align: center;
+            height: 40%;
+            background: linear-gradient(135deg, #daac84 30%, #f3ae99 50%, #e8a28c 75%, #ea8783 100%);
+            .avatar_border {
+                position: absolute;
+                top: 50px;
+                left: 50%;
+                transform: translate(-50%, 0);
+                width: 90px;
+                height: 90px;
+                border: 1px solid white;
+                border-radius: 50%;
+            }
+            .avatar {
+                position: absolute;
+                width: 80px;
+                height: 80px;
+                top: 55px;
+                left: 50%;
+                transform: translate(-50%, 0);
+                border-radius: 50%;
+            }
+            h3 {
+                padding-top: 170px;
+                font-size: 16px;
+                letter-spacing: 1px;
+            }
+            p {
+                font-size: 14px;
+                margin: 10px 40px;
+                font-weight: 200;
+                letter-spacing: 1px;
+            }
+        }
+        .category_wrapper {
+            padding-top: 30px;
+        }
+    }
+
+    .active {
+        .mu-item, .mu-item-left, .mu-item-right {
+            color: #ea8783;
+        }
+    }
+</style>

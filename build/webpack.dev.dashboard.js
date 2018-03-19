@@ -4,6 +4,24 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const config = require('./config');
 
+const museUiThemePath = path.join(
+    __dirname,
+    '..',
+    'node_modules',
+    'muse-ui',
+    'src/styles/themes/variables/light.less'
+)
+
+baseConfig.module.rules[2].use[3] = {
+    loader: 'less-loader',
+    options: {
+        globalVars: {
+            'museUiTheme': `'${museUiThemePath}'`,
+            'bdcolor': '#333333'
+        }
+    }
+}
+
 module.exports = Object.assign({}, baseConfig, {
     entry: {
         dashboard: [path.resolve(__dirname, '../dashboard/app.js'), 'webpack-hot-middleware/client?path=/__dashboard_hmr&reload=true'],

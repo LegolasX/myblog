@@ -343,6 +343,7 @@
         overflow: hidden;
         padding: 2em 2.5em;
         color: @fontColorDescription;
+        background-color: white;
         header {
             overflow: hidden;
         }

@@ -4,7 +4,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const baseConfig = require('./webpack.base.config');
 const vueSSRClientPlugin = require('./vur-server-renderer-client-plugin');
 const config = require('./config.js');
-const isProd =  process.env.NODE_ENV === 'production';
+const isProd = process.env.NODE_ENV === 'production';
 
 clientConfig = Object.assign({}, baseConfig, {
     entry: {
@@ -19,12 +19,14 @@ clientConfig = Object.assign({}, baseConfig, {
     plugins: [
         new CleanWebpackPlugin(path.resolve(__dirname, '../static/client/'), {
             root: path.resolve(__dirname, '../../myblog/'),
-            verbose: true, 
+            verbose: true,
             dry: false
         }),
         new webpack.BannerPlugin(new Date().getFullYear() + '年' + parseInt(new Date().getMonth() + 1, 10) + '月' + new Date().getDate() + '日' + new Date().getHours() + '点' + new Date().getMinutes() + '分' + '编译'),
         new webpack.DefinePlugin({
-            PRODUCTION: JSON.stringify('true'),
+            'process.env': {
+                NODE_ENV: '"production"'
+            }
         }),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor',
@@ -38,7 +40,10 @@ if (isProd) {
     // 生产环境压缩
     clientConfig.plugins.unshift(new webpack.optimize.UglifyJsPlugin({
         exclude: [/server/, /static/],
-        comments: false
+        comments: false,
+        compress: {
+            warnings: false
+        }
     }));
 }
 

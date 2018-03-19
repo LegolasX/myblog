@@ -1,9 +1,42 @@
+const path = require('path');
+
+const museUiThemePath = path.join(
+    __dirname,
+    '..',
+    'node_modules',
+    'muse-ui',
+    'src/styles/themes/variables/light.less'
+)
+
 module.exports = {
     module: {
         rules: [
             {
                 test: /\.vue$/,
-                loader: 'vue-loader'
+                loader: 'vue-loader',
+                options: {
+                    loaders: {
+                        less: [
+                            'vue-style-loader',
+                            {
+                                loader: 'css-loader',
+                                options: {
+                                    importLoaders: 2
+                                }
+                            },
+                            'postcss-loader',
+                            {
+                                loader: 'less-loader',
+                                options: {
+                                    globalVars: {
+                                        'museUiTheme': `'${museUiThemePath}'`,
+                                        'bdcolor': '#333333'
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
             },
             {
                 test: /\.js$/,
@@ -47,5 +80,8 @@ module.exports = {
                 ]
             }
         ]
+    },
+    resolve: {
+        extensions: [".js", ".vue", ".css", ".less", ".json"]
     }
 }
