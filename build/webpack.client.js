@@ -14,7 +14,9 @@ clientConfig = Object.assign({}, baseConfig, {
     output: {
         path: config.client.path,
         publicPath: isProd ? config.client.production.publicPath : config.client.dev.publicPath,
-        filename: '[name].[hash:8].client.js'
+        filename: '[name].[hash:8].client.js',
+        // 非入口chunk的文件名称
+        chunkFilename: '[name].[hash:8].client.js'
     },
     plugins: [
         new CleanWebpackPlugin(path.resolve(__dirname, '../static/client/'), {

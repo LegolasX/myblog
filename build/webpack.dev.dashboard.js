@@ -24,7 +24,7 @@ baseConfig.module.rules[2].use[3] = {
 
 module.exports = Object.assign({}, baseConfig, {
     entry: {
-        dashboard: [path.resolve(__dirname, '../dashboard/app.js'), 'webpack-hot-middleware/client?path=/__dashboard_hmr&reload=true'],
+        app: [path.resolve(__dirname, '../dashboard/app.js'), 'webpack-hot-middleware/client?path=/__dashboard_hmr&reload=true'],
         vendor: ['vue', 'vue-router', 'axios']
     },
     output: {
@@ -32,12 +32,16 @@ module.exports = Object.assign({}, baseConfig, {
         path:  path.resolve(__dirname, '../dashboard'),
         // 文件中Url的网络路径
         publicPath: '/dashboard',
-        filename: '[name].[hash:8].dashboard.js'
+        filename: '[name].[hash:8].dashboard.js',
+        // 非入口chunk的文件名称
+        chunkFilename: '[name].[hash:8].client.js'
     },
     plugins: [
         new webpack.BannerPlugin('dev middleware' + new Date().getFullYear() + '年' + parseInt(new Date().getMonth() + 1, 10) + '月' + new Date().getDate() + '日' + new Date().getHours() + '点' + new Date().getMinutes() + '分' + '编译'),
         new webpack.DefinePlugin({
-            PRODUCTION: JSON.stringify(false),
+            'process.env': {
+                NODE_ENV: '"development"'
+            }
         }),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor',

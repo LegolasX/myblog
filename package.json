@@ -1,8 +1,8 @@
 {
   "name": "myblog",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Blog",
+  "main": "server/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "supervisor --watch server server/index.js",
@@ -12,6 +12,10 @@
     "build:dashboard": "cross-env NODE_ENV=production webpack --config ./build/webpack.dashboard.js --progress --hide-modules",
     "build:dev": "webpack --config ./build/webpack.client.js && webpack --config ./build/webpack.server.js",
     "build": "npm run build:client && npm run build:server && npm run build:dashboard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecizep/myblog.git"
   },
   "author": "ecizep",
   "license": "ISC",
@@ -32,7 +36,6 @@
     "@babel/runtime": "^7.0.0-beta.42",
     "babel-loader": "^8.0.0-beta.0",
     "body-parser": "^1.18.2",
-    "ccap": "^0.6.10",
     "chalk": "^2.3.2",
     "chokidar": "^2.0.2",
     "clean-webpack-plugin": "^0.1.17",
@@ -51,7 +54,6 @@
     "memory-fs": "^0.4.1",
     "mongodb": "^3.0.1",
     "mongolass": "^4.1.0",
-    "mongoose": "^5.0.3",
     "muse-ui": "^2.1.0",
     "postcss-cssnext": "^3.1.0",
     "postcss-import": "^11.0.0",
@@ -64,8 +66,8 @@
     "vue-style-loader": "^3.1.2",
     "vue-template-compiler": "^2.5.13",
     "webpack": "^3.10.0",
+    "webpack-bundle-analyzer": "^2.11.1",
     "webpack-dev-middleware": "2.0.3",
-    "webpack-dev-server": "^2.9.7",
     "webpack-hot-middleware": "^2.21.1"
   }
 }

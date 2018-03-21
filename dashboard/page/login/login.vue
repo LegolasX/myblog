@@ -36,21 +36,19 @@
             }
         },
         created() {
-            console.log(this);
-            this.$toast({
-                message: 'sdfasd',
-                closeCb: () => {
-                    console.log('toast close');
-                }
-            })
         },
         methods: {
             login() {
                 login(this.username, this.password).then((res) => {
+                    
                     if (res.data.code === 200) {
-                        this.$router.push({
-                            name: 'dashboard'
-                        });
+                        if (this.$route.query.returnUrl) {
+                            location.href = this.$route.query.returnUrl;
+                        } else {
+                            this.$router.push({
+                                name: 'dashboard'
+                            });
+                        }
                     } else {
                         this.$toast({
                             message: '登录失败'

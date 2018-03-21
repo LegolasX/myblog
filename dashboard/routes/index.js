@@ -1,18 +1,35 @@
+
+
 export default [{
     name: 'dashboard',
     path: '/',
-    component: () => import('../page/dashboard/dashboard.vue'),
-    children: [
-        {
+    component: () => import(
+        /* webpackChunkName: "dashboard" */
+        '../page/dashboard/dashboard.vue'
+    ),
+    children: [{
             name: 'createArticle',
             path: 'createArticle',
-            component: () => import('../page/article/create-article.vue')
+            component: () => import(
+                /* webpackChunkName: "createArticle" */
+                '../page/article/create-article.vue'
+            )
+        }, {
+            name: 'categoryArticle',
+            path: 'categoryArticle',
+            component: () => import(
+                /* webpackChunkName: "categoryArticle" */
+                '../page/article/category.vue'
+            )
         }
     ]
 },{
     name: 'login',
     path: '/login',
-    component: () => import('../page/login/login.vue')
+    component: () => import(
+        /* webpackChunkName: "login" */
+        '../page/login/login.vue'
+    )
 },{
     path: '*',
     redirect: '/'

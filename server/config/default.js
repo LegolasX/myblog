@@ -3,7 +3,7 @@ module.exports = {
     session: {
         key: 'ECIZEP_SESSIONID',
         secret: 'lovelyy',
-        maxAge: 1800000,
+        maxAge: 3600000,
         domain: process.env.NODE_ENV === 'production' ? '140.143.164.218' : 'ecizep.com'
     },
     mongodb: {

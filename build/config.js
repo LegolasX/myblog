@@ -20,11 +20,11 @@ module.exports = {
         path: path.resolve(__dirname, '../static/dashboard/'),
         dev: {
             publicPath: devDomain + '/static/dashboard/',
-            apiBaseUrl: devDomain + '/api/'
+            apiBaseUrl: devDomain + '/api/dashboard'
         },
         production: {
             publicPath: productionDomain + '/static/dashboard/',
-            apiBaseUrl: productionDomain + '/api/'
+            apiBaseUrl: productionDomain + '/api/dashboard'
         }
     }
 }

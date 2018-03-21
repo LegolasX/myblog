@@ -89,9 +89,14 @@ const apiRouter = require('./router/api');
 
 app.use('/api', apiRouter);
 app.use('/dashboard',  function (req, res, next) {
-    console.log(req.url);
-    res.setHeader('Content-Type', 'text/html');
-    res.sendFile(path.resolve(__dirname, './dashboard.html'));
+    console.log(req.baseUrl);
+    if (req.baseUrl === '/dashboard') {
+        res.setHeader('Content-Type', 'text/html');
+        res.sendFile(path.resolve(__dirname, './dashboard.html'));
+    } else {
+        res.end('404');
+    }
+    
 });
 
 let ECIZEP_ID = 1;

@@ -8,13 +8,24 @@
             </div>
             <div class="category_wrapper">
                 <mu-list>
-                    <mu-list-item title="Moments" :class="{active: tabIndex === 0}" @click="changeTab(0)">
+                    <mu-list-item title="Moments" @click="changeTab(0)">
                         <span class="icon-instagram" slot="left" style="font-size: 125%"></span>
-                        <span slot="right">20</span>
-                    </mu-list-item>
-                    <mu-list-item title="Article"  :class="{active: tabIndex === 1}" @click="changeTab(1)">
-                        <span class="icon-paper-plane" slot="left"></span>
                         <span slot="right">40</span>
+                    </mu-list-item>
+                    <mu-list-item title="Article" toggleNested @click="changeTab(1)">
+                        <span class="icon-paper-plane" slot="left"></span>
+                        <div class="second_list" slot="nested">
+                            <mu-list-item :class="{active: $route.name === 'createArticle'}" title="发表文章" @click="changeRouter('createArticle')">
+                                <span class="icon-paper-plane" slot="left" style="opacity:0"></span>
+                            </mu-list-item>
+                            <mu-list-item :class="{active: $route.name === 'categoryArticle'}" title="分类管理" @click="changeRouter('categoryArticle')">
+                                <span class="icon-paper-plane" slot="left"  style="opacity:0"></span>
+                            </mu-list-item>
+                            <mu-list-item title="文章列表">
+                                <span class="icon-paper-plane" slot="left"  style="opacity:0"></span>
+                                <span slot="right">40</span>
+                            </mu-list-item>
+                        </div>
                     </mu-list-item>
                     <mu-list-item title="Photos"  :class="{active: tabIndex === 2}" @click="changeTab(2)">
                         <span class="icon-image" slot="left"></span>
@@ -46,7 +57,16 @@
         methods: {
             changeTab (tabIndex) {
                 this.$emit('changeTab', tabIndex);
-            }
+            },
+            changeRouter (name) {
+                if (this.$route.name === name) {
+                    return void 666;
+                } else {
+                    this.$router.push({
+                        name: name
+                    });
+                }
+            } 
         },
         components: {
             muList,
