@@ -1,11 +1,11 @@
 <template>
     <div class="create_article">
-        <h2>Articles</h2>
+        <h2>发表文章</h2>
         <mu-paper :zDepth="2" class="paper_panel">
             <mu-text-field label="文章标题" :label-float="true" :full-width="true" :max-length="20"  hintText="不超过20个字符" error-text=""/>
             <div class="panel_cell">
-                <mu-select-field v-model="game1" class="cell_inline" label="选择文章分类">
-                    <mu-menu-item v-for="(text,index) in list" :key="index" :value="index" :title="text" />
+                <mu-select-field v-model="currentChoose" class="cell_inline" label="选择文章分类">
+                    <mu-menu-item v-for="(item,index) in categoryList" :key="index" :value="item.categoryName" :title="item.categoryName" />
                 </mu-select-field>
                 <mu-date-picker v-model="article.createDate" :auto-ok="true" class="cell_inline" hintText="选择日期" mode="portrait" label="发表日期"/>
                 <mu-time-picker v-model="article.createTime" :auto-ok="true" class="cell_inline" label="发表时间" hintText="选择时间" mode="landscape" format="24hr"/>
@@ -35,6 +35,9 @@
     import muSwitch from 'muse-ui/src/switch/index';
     import muTimePicker from 'muse-ui/src/timePicker/index';
     import editor from '../../components/editor/editor.vue';
+    import {
+        getCategory
+    } from '../../api/category'
 
     function getDate() {
         let now = new Date();
@@ -64,8 +67,8 @@
                     createTime: dateObject.time
                 },
                 isPublic: true,
-                game1: 0,
-                list: ['Web前端', 'Node.js', 'Webpack'],
+                currentChoose: 0,
+                categoryList: [],
                 msgShow: '我要显示的内容',
                 msg: {
                     mdValue: ''
@@ -73,7 +76,16 @@
             }
         },
         created() {
-
+            getCategory().then(res => {
+                if (res.data.code === 200) {
+                    this.categoryList = res.data.data;
+                    this.currentChoose = this.categoryList[0].categoryName;
+                } else {
+                    this.$toast({
+                        message: '获取分类列表失败，请重试'
+                    })
+                }
+            })
         },
         mounted() {
 

@@ -67,8 +67,9 @@
 <style lang="less" scoped>
     .half_top {
         height: 50%;
-        background-image: linear-gradient(60deg, #abecd6 0%, #fbed96 100%);
-        color: #bb8282;
+        background: url('../../assets/images/1.jpeg') left top no-repeat;
+        background-size: cover;
+        color: white;
         text-align: center;
         h1 {
             font-size: 40px;

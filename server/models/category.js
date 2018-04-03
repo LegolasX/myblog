@@ -10,5 +10,21 @@ module.exports = {
         return MongoManager.find(COLLECTION, {
             username
         })
+    },
+    modifyCategoryById (categoryId, categoryName) {
+        categoryId = typeof categoryId !== 'number' ? parseInt(categoryId) : categoryId;
+        return MongoManager.findOneAndUpdate(COLLECTION, {
+            _id: categoryId
+        }, {
+            $set: {
+                categoryName: categoryName
+            }
+        })
+    },
+    deleteCategoryById (categoryId) {
+        categoryId = typeof categoryId !== 'number' ? parseInt(categoryId) : categoryId;
+        return MongoManager.remove(COLLECTION, {
+            _id: categoryId
+        })
     }
 }

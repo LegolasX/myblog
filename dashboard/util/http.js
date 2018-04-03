@@ -13,8 +13,9 @@ axios.interceptors.response.use(function (response) {
     if (response.status === 200 && response.data.code === 203) {
         let returnUrl = location.href;
         location.href = location.origin + '/dashboard#/login?returnUrl=' + encodeURIComponent(returnUrl)
+    } else {
+        return response;
     }
-    return response;
 })
 
 export default axios;

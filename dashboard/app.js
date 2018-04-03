@@ -5,9 +5,15 @@ import App from './App.vue';
 import './assets/css/icon.css';
 import 'muse-ui/src/styles/base.less';
 import './assets/css/reset.less';
-import Toast from './components/toast/index';
 
-Vue.prototype.$toast = Toast;
+// 注册全局方法
+import toast from './components/toast/index';
+import confirm from './components/confirm/index';
+
+Vue.prototype.$toast = toast;
+Vue.prototype.$confirm = confirm;
+
+
 Vue.use(vueRouter);
 
 const router = new vueRouter({

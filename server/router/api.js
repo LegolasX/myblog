@@ -10,13 +10,13 @@ const dashboardRouter = require('./dashboard');
 const checkLogin = require('../middleware/checklogin');
 
 // 后台需要验证登录的接口
-router.use('/dashboard', checkLogin, dashboardRouter);
+router.use('/dashboard', CORS, checkLogin, dashboardRouter);
 
 
 /* 
     登录注册相关
 */
-router.post('/login', function (req, res, next) {
+router.post('/login', CORS, function (req, res, next) {
     console.log(req.body);
     User.login(req.body).then((result) => {
         if (result) {
@@ -39,38 +39,6 @@ router.post('/login', function (req, res, next) {
 /* 
     post
 */
-
-// 创建post
-router.post('/post', function (req, res, next) {
-    if (req.session.username === undefined) {
-        res.json({
-            code: 203,
-            data: {
-                loginUrl: 'hh'
-            },
-            message: 'Not Login'
-        });
-    } else {
-        if (req.body.content) {
-            req.body.marked = req.body.content;
-            req.body.content = marked(req.body.marked);
-            req.body.username = req.session.username;
-            req.body.createTime = Date.now().toString();
-            req.body.userView = 0;
-        }
-        posts.createPost(req.body).then((result) => {
-            console.log(result.result);
-            console.log(result.insertedCount);
-            if (result.result.ok === 1) {
-                resizeBy.json({
-                    code: 200,
-                    data: null,
-                    message: 'POST SUCCESS'
-                });
-            }
-        });
-    }
-});
 
 // 根据postId获取post
 router.get('/post/:postId', CORS, function (req, res, next) {

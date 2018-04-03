@@ -1,6 +1,6 @@
 module.exports = function (req, res, next) {
     console.log(req.url);
-    const OriginList = ['http://ecizep.com:3030', 'http://140.143.164.218:3030', 'http://localhost:3030'];
+    const OriginList = ['http://ecizep.com:3030', 'http://ecizep.com:3031', 'http://140.143.164.218:3030', 'http://localhost:3030'];
     if (OriginList.some(value => value === req.headers.origin)) {
         res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
         // 非简单请求

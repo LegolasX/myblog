@@ -9,6 +9,9 @@ export default {
        return {
 
        }
+   },
+   created () {
+       console.log(this);
    }
 }
 </script>

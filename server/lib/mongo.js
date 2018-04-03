@@ -45,6 +45,10 @@ let MongoManager = {
     findOneAndUpdate: async function (collection, document, update) {
         await this._conntectDb();
         return this._db.collection(collection).findOneAndUpdate(document, update)
+    },
+    remove: async function (collection, document) {
+        await this._conntectDb();
+        return this._db.collection(collection).remove(document)
     }
 }
 
@@ -59,6 +63,14 @@ async function getDoc () {
     console.log(result);
 }
 
+function removeTest () {
+    MongoManager.remove('users', {
+        username: 'safd'
+    }).then(result => {
+        console.log(result);
+    })
+}
+// removeTest();
 // getDoc()
 
 module.exports = MongoManager;

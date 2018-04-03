@@ -10,5 +10,10 @@ module.exports = {
         url: 'mongodb://127.0.0.1:27017',
         port: 27017,
         dbName: 'blog'
+    },
+    qiniu: {
+        accessKey: '506YwbVY2LsUaiLGJ9eRq3BF18bQxoDFQv3aRTlh',
+        secretKey: 'oF3BjptI3Zv0E6ftXY7XeuVi-qTv915ZGZBJNZnv',
+        bucket: 'website'
     }
 }

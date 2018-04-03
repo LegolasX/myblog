@@ -10,8 +10,8 @@ const isProd = process.env.NODE_ENV === 'production';
 let bundleRenderer;
 let readyPromise;
 let templatePath = path.resolve(__dirname, './index.template.html')
-if (isProd) {
-    // 生产环境
+if (isProd || process.env.SERVER_ALONE === 'alone') {
+    // 生产环境 或者脱离开发模式
     let serverBundle = require('../static/client/vue-ssr-server-bundle.json');
     let clientManifest = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../static/client/vue-ssr-client-manifest.json')));
     const renderOption = {

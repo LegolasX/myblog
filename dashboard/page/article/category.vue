@@ -1,12 +1,8 @@
 <template>
     <div class="category_wrapper">
         <h2>分类管理</h2>
-
         <mu-paper :zDepth="2" class="paper_panel">
-            <mu-raised-button label="删除多个">
-                <span class="icon-trash-o icon_raised_button"></span>
-            </mu-raised-button>
-            <mu-raised-button label="添加分类" @click="dialog.show = true" labelPosition="after">
+            <mu-raised-button label="添加分类" @click="categoryAction(0)" labelPosition="after">
                 <span class="icon-plus-circle icon_raised_button"></span>
             </mu-raised-button>
             <mu-table multiSelectable enableSelectAll ref="table">
@@ -18,45 +14,36 @@
                     </mu-tr>
                 </mu-thead>
                 <mu-tbody>
-                    <mu-tr>
-                        <mu-td>1</mu-td>
-                        <mu-td>John Smith</mu-td>
-                        <mu-td>
-                            <mu-icon-button @click.stop class="table_button">
+                    <mu-tr v-for="item in categoryList" :key="item.id">
+                        <mu-td>{{item.categoryId}}</mu-td>
+                        <mu-td>{{item.categoryName}}</mu-td>
+                        <mu-td class="categoty_actions">
+                            <mu-icon-button @click.stop="categoryAction(1, item.categoryId, item.categoryName)" class="table_button">
+                                <span class="icon-edit"></span>
+                            </mu-icon-button>
+                            <mu-icon-button @click.stop="deleteCategory(item.categoryId, item.categoryName)" class="table_button">
                                 <span class="icon-trash-o"></span>
                             </mu-icon-button>
                         </mu-td>
                     </mu-tr>
-                    <mu-tr>
-                        <mu-td>2</mu-td>
-                        <mu-td>Randal White</mu-td>
-                        <mu-td>Unemployed</mu-td>
-                    </mu-tr>
-                    <mu-tr>
-                        <mu-td>3</mu-td>
-                        <mu-td>Stephanie Sanders</mu-td>
-                        <mu-td>Employed</mu-td>
-                    </mu-tr>
-                    <mu-tr>
-                        <mu-td>4</mu-td>
-                        <mu-td>Steve Brown</mu-td>
-                        <mu-td>Employed</mu-td>
-                    </mu-tr>
                 </mu-tbody>
             </mu-table>
         </mu-paper>
-        <mu-dialog :open="dialog.show" title="添加文章分类">
+        <mu-dialog :open="dialog.show" :title="dialog.title">
             <div class="dialog_content">
-                <mu-text-field label="分类名称" v-model="dialog.categoryName" :label-float="true" :full-width="true" :max-length="10"  hintText="不超过10个字符" error-text=""/>
+                <mu-text-field label="分类名称" v-model="dialog.categoryName" :label-float="true" :full-width="true" :max-length="15"  hintText="不超过10个字符" error-text=""/>
             </div>
             <mu-flat-button slot="actions" @click="dialog.show = false" primary label="取消"/>
-            <mu-flat-button slot="actions" @click="addCategory" primary label="确定"/>
+            <mu-flat-button slot="actions" @click="dialogConfirm" primary label="确定"/>
         </mu-dialog>
     </div>
 </template>
 <script>
     import {
-        addCategory
+        getCategory,
+        addCategory,
+        modifyCategory,
+        deleteCategory
     } from '../../api/category.js';
     import {
         table as muTable,
@@ -78,19 +65,90 @@
         data() {
             return {
                 dialog: {
+                    // 0: 新增  1. 修改, 2. 删除
+                    type: 0,
                     show: false,
-                    categoryName: ''
-                }
+                    title: '添加文章分类',
+                    categoryName: '',
+                    categoryId: ''
+                },
+                categoryList: []
             }
         },
         created() {
-
+            getCategory().then(res => {
+                if (res.data.code === 200) {
+                    this.categoryList = res.data.data;
+                } else {
+                    this.$toast({
+                        message: '获取分类列表失败，请重试'
+                    })
+                }
+            })
         },
         methods: {
-            addCategory () {
-                addCategory(this.dialog.categoryName).then(res => {
-
-                })
+            dialogConfirm () {
+                if (this.dialog.type === 0) {
+                    addCategory(this.dialog.categoryName).then(res => {
+                        if (res.data.code === 200) {
+                            this.categoryList.push({
+                                categoryId: res.data.data.categoryId,
+                                categoryName: this.dialog.categoryName
+                            })
+                            this.dialog.categoryName = '';
+                        }
+                    })
+                } else if (this.dialog.type === 1) {
+                    modifyCategory(this.dialog.categoryId, this.dialog.categoryName).then(res => {
+                        if (res.data.code === 200) {
+                            for (let item of this.categoryList) {
+                                if (item.categoryId === this.dialog.categoryId) {
+                                    item.categoryName = this.dialog.categoryName;
+                                    break;
+                                }
+                            }
+                            this.$toast({
+                                message: '修改成功'
+                            })
+                            this.dialog.categoryName = '';
+                        }
+                    })
+                }
+                this.dialog.show = false;
+            },
+            deleteCategory (categoryId, categoryName) {
+                this.$confirm({
+                    content: '你确定要删除 ' + categoryName + ' 分类吗',
+                    confirm: () => {
+                        deleteCategory(categoryId).then(res => {
+                            if (res.data.code === 200) {
+                                this.categoryList.forEach((item, index) => {
+                                    if (item.categoryId === categoryId) {
+                                        this.categoryList.splice(index, 1);
+                                    }
+                                })
+                                this.$toast({
+                                    message: '删除分类成功'
+                                });
+                            }
+                        })
+                    }
+               })
+            },
+            categoryAction (type, categoryId, categoryName) {
+                this.dialog.categoryId = categoryId || '';
+                this.dialog.categoryName = categoryName || '';
+                this.dialog.show = true;
+                switch(type) {
+                    case 0: 
+                        this.dialog.title = '添加文章分类';
+                        this.dialog.type = 0;
+                        break;
+                    case 1:
+                        this.dialog.title = '修改分类名称';
+                        this.dialog.type = 1;
+                        break;
+                }
             }
         },
         components: {
@@ -118,10 +176,13 @@
         }
         .paper_panel {
             padding: 30px;
-        }
-
-        .table_button {
-            font-size: 20px;
+            .categoty_actions {
+                font-size: 0;
+                .table_button {
+                    font-size: 20px;
+                    
+                }
+            }
         }
     }
 </style>
