@@ -13,6 +13,11 @@
             <div class="panel_cell">
                 <mu-text-field  label="文章描述" hintText="请输入文章的简要描述，不超过200个字符" multiLine :rows="3" :max-length="200" :label-float="true" :full-width="true"/>
             </div>
+            
+            <input type="file" name="photo" @change="fileUpload">
+            <mu-raised-button label="添加分类" @click="posttest" labelPosition="after">
+                <span class="icon-plus-circle icon_raised_button"></span>
+            </mu-raised-button>
             <mu-switch label="公开发表" v-model="isPublic" labelLeft class="switch" />
         </mu-paper>
         <div class="editorContainer">
@@ -27,10 +32,12 @@
     </div>
 </template>
 <script>
+    import http from '../../util/http';
     import muDatePicker from 'muse-ui/src/datePicker/index';
     import muTextField from 'muse-ui/src/textField/textField.vue';
     import muPaper from 'muse-ui/src/paper/index';
     import muSelectField from 'muse-ui/src/selectField/index';
+    import muRaisedButton from 'muse-ui/src/raisedButton/index';
     import muMenuItem from 'muse-ui/src/menu/menuItem.vue';
     import muSwitch from 'muse-ui/src/switch/index';
     import muTimePicker from 'muse-ui/src/timePicker/index';
@@ -68,6 +75,7 @@
                 },
                 isPublic: true,
                 currentChoose: 0,
+                currentPic: null,
                 categoryList: [],
                 msgShow: '我要显示的内容',
                 msg: {
@@ -91,6 +99,18 @@
 
         },
         methods: {
+            posttest () {
+                let formData = new FormData();
+                formData.append('cover', this.currentPic);
+                http.post('/upload', formData).then(res => {
+                    console.log(res);
+                })
+            },
+            fileUpload (event) {
+                this.currentPic = event.target.files[0];
+                console.log(this.currentPic);
+
+            },
             childEventHandler: function (res) {
                 // res会传回一个data,包含属性mdValue和htmlValue，具体含义请自行翻译
                 this.msg = res;
@@ -104,6 +124,7 @@
             muDatePicker,
             muTimePicker,
             muSwitch,
+            muRaisedButton,
             editor
         }
     }

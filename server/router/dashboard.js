@@ -1,8 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const fs = require('fs');
 const category = require('../models/category.js');
 const getUploadToken = require('../lib/qiniu').getUploadToken;
+
+let multer  = require('multer')
+let upload = multer({
+    dest: path.resolve(__dirname, '../upload/')
+})
+
 
 
 // 获取上传token
@@ -12,6 +19,21 @@ router.get('/upload/token', function (req, res) {
         data: getUploadToken(),
         message: 'get uploadToken success'
     })
+})
+
+router.post('/upload', upload.single('cover'), function (req, res) {
+    console.log(req.body);
+    console.log(req.file);
+    if (!!req.file) {
+        console.log(req.file.buffer);
+        // let writeStream = fs.createWriteStream('../upload/' + req.files.cover.fieldName);
+        // writeStream.write(req.files.file.buffer);
+        res.json({
+            code: 200,
+            message: 'sdfs',
+            data: null
+        });
+    }
 })
 
 // 创建post
