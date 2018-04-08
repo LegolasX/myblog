@@ -1,4 +1,5 @@
 let MongoManager = require('../lib/mongo');
+let ObjectID = require('mongodb').ObjectID;
 
 const COLLECTION = 'posts';
 
@@ -8,7 +9,7 @@ module.exports = {
     },
     getPostById: function (postId) {
         return MongoManager.findOne(COLLECTION, {
-            _id: parseInt(postId)
+            _id: ObjectID(postId)
         });
     },
     getPostByUsername: function (username) {

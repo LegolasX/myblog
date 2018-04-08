@@ -1,20 +1,22 @@
 let MongoManager = require('../lib/mongo.js');
-
+let ObjectID = require('mongodb').ObjectID;
 const COLLECTION = 'comments';
 
 module.exports = {
     addComment (comments) {
+        // postId 类型转换
+        comments.postId = ObjectID(comments.postId);
         return MongoManager.insertOne(COLLECTION, comments);
     },
     getCommentsByPostId (postId) {
         return MongoManager.find(COLLECTION, {
-            postId
+            postId: ObjectID(postId)
         });
     },
     voteOrDislikeComment (commentId, vote) {
         if (vote) {
             return MongoManager.findOneAndUpdate(COLLECTION, {
-                '_id': commentId
+                '_id': ObjectID(commentId)
             }, {
                 $inc: {
                     voteCount: 1
@@ -22,7 +24,7 @@ module.exports = {
             });
         } else {
             return MongoManager.findOneAndUpdate(COLLECTION, {
-                '_id': commentId
+                '_id': ObjectID(commentId)
             }, {
                 $inc: {
                     dislikeCount: 1
@@ -33,7 +35,7 @@ module.exports = {
     cancelVoteOrDislike (commentId, vote) {
         if (vote) {
             return MongoManager.findOneAndUpdate(COLLECTION, {
-                '_id': commentId
+                '_id': ObjectID(commentId)
             }, {
                 $inc: {
                     voteCount: -1
@@ -41,7 +43,7 @@ module.exports = {
             });
         } else {
             return MongoManager.findOneAndUpdate(COLLECTION, {
-                '_id': commentId
+                '_id': ObjectID(commentId)
             }, {
                 $inc: {
                     dislikeCount: -1
@@ -51,7 +53,7 @@ module.exports = {
     },
     replyComment (commentId, comment) {
         return MongoManager.findOneAndUpdate(COLLECTION, {
-            '_id': commentId
+            '_id': ObjectID(commentId)
         }, {
             $push: {
                 replyList: comment

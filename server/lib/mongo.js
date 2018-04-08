@@ -23,16 +23,15 @@ let MongoManager = {
      },
     insertOne: async function (collection, document) {
         await this._conntectDb();
-        let keyMap = {
+        /* let keyMap = {
             category: 'categoryId',
             posts: 'postId',
             users: 'userId',
             comments: 'commentId'
         }
         let id = await this._getNextSequenceValue(keyMap[collection]);
-        document._id = id;
-        return this._db.collection(collection)
-            .insertOne(document);
+        document._id = id; */
+        return this._db.collection(collection).insertOne(document);
     },
     find: async function (collection, document) {     
         await this._conntectDb();

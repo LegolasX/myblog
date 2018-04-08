@@ -1,5 +1,5 @@
 let MongoManager = require('../lib/mongo.js');
-
+let ObjectID = require('mongodb').ObjectID;
 const COLLECTION = 'category';
 
 module.exports = {
@@ -12,9 +12,8 @@ module.exports = {
         })
     },
     modifyCategoryById (categoryId, categoryName) {
-        categoryId = typeof categoryId !== 'number' ? parseInt(categoryId) : categoryId;
         return MongoManager.findOneAndUpdate(COLLECTION, {
-            _id: categoryId
+            _id: ObjectID(categoryId)
         }, {
             $set: {
                 categoryName: categoryName
@@ -22,9 +21,8 @@ module.exports = {
         })
     },
     deleteCategoryById (categoryId) {
-        categoryId = typeof categoryId !== 'number' ? parseInt(categoryId) : categoryId;
         return MongoManager.remove(COLLECTION, {
-            _id: categoryId
+            _id: ObjectID(categoryId)
         })
     }
 }

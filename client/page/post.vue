@@ -96,7 +96,7 @@
         asyncData({
             store
         }) {
-            return store.dispatch('getPostOnServer');
+            return store.dispatch('getPostOnServer', this.$route.params.postId);
         },
         data() {
             return {

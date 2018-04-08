@@ -2,27 +2,29 @@
     <div class="create_article">
         <h2>发表文章</h2>
         <mu-paper :zDepth="2" class="paper_panel">
-            <mu-text-field label="文章标题" :label-float="true" :full-width="true" :max-length="20"  hintText="不超过20个字符" error-text=""/>
+            <mu-text-field v-model="article.title" label="文章标题" :label-float="true" :full-width="true" :max-length="20"  hintText="不超过20个字符" error-text=""/>
             <div class="panel_cell">
-                <mu-select-field v-model="currentChoose" class="cell_inline" label="选择文章分类">
-                    <mu-menu-item v-for="(item,index) in categoryList" :key="index" :value="item.categoryName" :title="item.categoryName" />
+                <mu-select-field v-model="article.categoryId" class="cell_inline" label="选择文章分类">
+                    <mu-menu-item v-for="(item,index) in categoryList" :key="index" :value="item.categoryId" :title="item.categoryName" />
                 </mu-select-field>
-                <mu-date-picker v-model="article.createDate" :auto-ok="true" class="cell_inline" hintText="选择日期" mode="portrait" label="发表日期"/>
-                <mu-time-picker v-model="article.createTime" :auto-ok="true" class="cell_inline" label="发表时间" hintText="选择时间" mode="landscape" format="24hr"/>
+                <mu-date-picker v-model="article.date" :auto-ok="true" class="cell_inline" hintText="选择日期" mode="portrait" label="发表日期"/>
+                <mu-time-picker v-model="article.time" :auto-ok="true" class="cell_inline" label="发表时间" hintText="选择时间" mode="landscape" format="24hr"/>
             </div>
             <div class="panel_cell">
-                <mu-text-field  label="文章描述" hintText="请输入文章的简要描述，不超过200个字符" multiLine :rows="3" :max-length="200" :label-float="true" :full-width="true"/>
+                <mu-text-field v-model="article.description"  label="文章描述" hintText="请输入文章的简要描述，不超过200个字符" multiLine :rows="3" :max-length="200" :label-float="true" :full-width="true"/>
             </div>
             
             <input type="file" name="photo" @change="fileUpload">
             <mu-raised-button label="添加分类" @click="posttest" labelPosition="after">
                 <span class="icon-plus-circle icon_raised_button"></span>
             </mu-raised-button>
-            <mu-switch label="公开发表" v-model="isPublic" labelLeft class="switch" />
+            <!-- <mu-switch label="公开发表" v-model="isPublic" labelLeft class="switch" /> -->
+            <mu-raised-button label="发表文章" @click="submitPost" labelPosition="after">
+            </mu-raised-button>
         </mu-paper>
         <div class="editorContainer">
             <editor 
-                :mdValuesP="msg.mdValue"  
+                :mdValuesP="editorContent.mdValue"  
                 :fullPageStatusP="false" 
                 :editStatusP="true" 
                 :previewStatusP="true" 
@@ -44,7 +46,10 @@
     import editor from '../../components/editor/editor.vue';
     import {
         getCategory
-    } from '../../api/category'
+    } from '../../api/category';
+    import {
+        createPost
+    } from '../../api/post';
 
     function getDate() {
         let now = new Date();
@@ -62,6 +67,7 @@
         }
         result.date = result.year + '-' + result.month + '-' + result.day;
         result.time = result.hour + ':' + result.minute;
+        result.value = now.valueOf();
         return result;
     }
     let dateObject = getDate();
@@ -70,16 +76,21 @@
         data() {
             return {
                 article: {
-                    createDate: dateObject.date,
-                    createTime: dateObject.time
+                    date: dateObject.date,
+                    time: dateObject.time,
+                    createTime: dateObject.value,
+                    description: '',
+                    categoryId: '',
+                    markdown: '',
+                    title: ''
                 },
                 isPublic: true,
-                currentChoose: 0,
                 currentPic: null,
                 categoryList: [],
-                msgShow: '我要显示的内容',
-                msg: {
-                    mdValue: ''
+                // 编辑器内容
+                editorContent: {
+                    mdValue: '',
+                    htmlValue: ''
                 }
             }
         },
@@ -87,7 +98,7 @@
             getCategory().then(res => {
                 if (res.data.code === 200) {
                     this.categoryList = res.data.data;
-                    this.currentChoose = this.categoryList[0].categoryName;
+                    this.article.categoryId = this.categoryList[0].categoryId;
                 } else {
                     this.$toast({
                         message: '获取分类列表失败，请重试'
@@ -95,10 +106,16 @@
                 }
             })
         },
-        mounted() {
-
-        },
         methods: {
+            submitPost () {
+                let postParams = Object.assign({}, this.article);
+                delete postParams.date;
+                delete postParams.time;
+                postParams.markdown = this.editorContent.mdValue;
+                createPost(postParams).then(res => {
+                    console.log(res);
+                });
+            },
             posttest () {
                 let formData = new FormData();
                 formData.append('cover', this.currentPic);
@@ -113,7 +130,7 @@
             },
             childEventHandler: function (res) {
                 // res会传回一个data,包含属性mdValue和htmlValue，具体含义请自行翻译
-                this.msg = res;
+                this.editorContent = res;
             }
         },
         components: {

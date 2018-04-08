@@ -4,7 +4,6 @@ const posts = require('../models/posts');
 const comments = require('../models/comments');
 const User = require('../models/users');
 const CORS = require('../middleware/cors');
-const marked = require('marked');
 
 const dashboardRouter = require('./dashboard');
 const checkLogin = require('../middleware/checklogin');
@@ -96,14 +95,13 @@ router.get('/postList/:username', CORS, function (req, res, next) {
 
 // 添加评论
 router.post('/comment', CORS, function (req, res, next) {
-    if (req.body.postId === undefined || req.body.comment === undefined) {
+    if (!req.body.postId || !req.body.comment) {
         res.json({
-            code: 203,
+            code: 204,
             data: null,
             message: 'lack of params'
         });
     }
-    req.body.postId = parseInt(req.body.postId);
     comments.addComment(req.body).then(result => {
         if (result.insertedCount === 1) {
             res.json({
@@ -133,7 +131,7 @@ router.get('/comment', CORS, function (req, res) {
             message: 'lack of params'
         });
     } else {
-        comments.getCommentsByPostId(parseInt(req.query.postId)).then(commentList => {
+        comments.getCommentsByPostId(req.query.postId).then(commentList => {
             commentList.forEach((comment) => {
                 comment.commentId = comment._id;
                 delete comment._id;
@@ -156,7 +154,7 @@ router.get('/comment', CORS, function (req, res) {
 // 根据comemntId给评论点赞
 router.get('/comment/:commentId/vote', CORS, function (req, res) {
     if (req.params.commentId !== undefined) {
-        comments.voteOrDislikeComment(parseInt(req.params.commentId), true).then(result => {
+        comments.voteOrDislikeComment(req.params.commentId, true).then(result => {
             if (result.lastErrorObject.updatedExisting && result.ok === 1) {
                 res.json({
                     code: 200,
@@ -165,7 +163,7 @@ router.get('/comment/:commentId/vote', CORS, function (req, res) {
                 });
             } else {
                 res.json({
-                    code: 204,
+                    code: 500,
                     data: null,
                     message: 'system error'
                 });
@@ -173,7 +171,7 @@ router.get('/comment/:commentId/vote', CORS, function (req, res) {
         })
     } else {
         res.json({
-            code: 203,
+            code: 204,
             data: null,
             message: 'lack of params'
         });
@@ -183,7 +181,7 @@ router.get('/comment/:commentId/vote', CORS, function (req, res) {
 // 根据comemntId给评论点反对
 router.get('/comment/:commentId/dislike', CORS, function (req, res) {
     if (req.params.commentId !== undefined) {
-        comments.voteOrDislikeComment(parseInt(req.params.commentId), false).then(result => {
+        comments.voteOrDislikeComment(req.params.commentId, false).then(result => {
             if (result.lastErrorObject.updatedExisting && result.ok === 1) {
                 res.json({
                     code: 200,
@@ -192,7 +190,7 @@ router.get('/comment/:commentId/dislike', CORS, function (req, res) {
                 });
             } else {
                 res.json({
-                    code: 204,
+                    code: 500,
                     data: null,
                     message: 'system error'
                 });
@@ -200,7 +198,7 @@ router.get('/comment/:commentId/dislike', CORS, function (req, res) {
         })
     } else {
         res.json({
-            code: 203,
+            code: 204,
             data: null,
             message: 'lack of params'
         });
@@ -210,7 +208,7 @@ router.get('/comment/:commentId/dislike', CORS, function (req, res) {
 // 根据comemntId给评论点赞
 router.get('/comment/:commentId/cancelVote', CORS, function (req, res) {
     if (req.params.commentId !== undefined) {
-        comments.cancelVoteOrDislike(parseInt(req.params.commentId), true).then(result => {
+        comments.cancelVoteOrDislike(req.params.commentId, true).then(result => {
             if (result.lastErrorObject.updatedExisting && result.ok === 1) {
                 res.json({
                     code: 200,
@@ -219,7 +217,7 @@ router.get('/comment/:commentId/cancelVote', CORS, function (req, res) {
                 });
             } else {
                 res.json({
-                    code: 204,
+                    code: 500,
                     data: null,
                     message: 'system error'
                 });
@@ -227,7 +225,7 @@ router.get('/comment/:commentId/cancelVote', CORS, function (req, res) {
         })
     } else {
         res.json({
-            code: 203,
+            code: 204,
             data: null,
             message: 'lack of params'
         });
@@ -237,7 +235,7 @@ router.get('/comment/:commentId/cancelVote', CORS, function (req, res) {
 // 根据comemntId给评论点反对
 router.get('/comment/:commentId/cancelDislike', CORS, function (req, res) {
     if (req.params.commentId !== undefined) {
-        comments.cancelVoteOrDislike(parseInt(req.params.commentId), false).then(result => {
+        comments.cancelVoteOrDislike(req.params.commentId, false).then(result => {
             if (result.lastErrorObject.updatedExisting && result.ok === 1) {
                 res.json({
                     code: 200,
@@ -246,7 +244,7 @@ router.get('/comment/:commentId/cancelDislike', CORS, function (req, res) {
                 });
             } else {
                 res.json({
-                    code: 204,
+                    code: 500,
                     data: null,
                     message: 'system error'
                 });
@@ -254,7 +252,7 @@ router.get('/comment/:commentId/cancelDislike', CORS, function (req, res) {
         })
     } else {
         res.json({
-            code: 203,
+            code: 204,
             data: null,
             message: 'lack of params'
         });
@@ -268,7 +266,7 @@ router.post('/comment/reply', CORS, function (req, res) {
     delete req.body.commentId;
     delete req.body.postId;
     if (commentId !== undefined) {
-        comments.replyComment(parseInt(commentId), req.body).then(result => {
+        comments.replyComment(commentId, req.body).then(result => {
             if (result.lastErrorObject.updatedExisting && result.ok === 1) {
                 res.json({
                     code: 200,
@@ -277,7 +275,7 @@ router.post('/comment/reply', CORS, function (req, res) {
                 });
             } else {
                 res.json({
-                    code: 204,
+                    code: 500,
                     data: null,
                     message: 'system error'
                 });
@@ -285,7 +283,7 @@ router.post('/comment/reply', CORS, function (req, res) {
         })
     } else {
         res.json({
-            code: 203,
+            code: 204,
             data: null,
             message: 'lack of params'
         });
