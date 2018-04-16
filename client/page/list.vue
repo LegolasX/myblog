@@ -1,15 +1,21 @@
 <template>
     <section class="blog_home">
+        <h1 class="category_title" v-if="$route.name === 'category'">
+            分类：{{category ? category.categoryName : ''}}
+        </h1>
         <article class="blog_post" v-for="post in postList" :key="post.postId">
             <img class="post_image" :src="post.imageUrl" @click="gotoPost(post.postId)">
             <div class="post_title" @click="gotoPost(post.postId)">
                 <h2>{{post.title}}</h2>
-                <p>{{post.summary}}</p>
+                <p>{{post.description}}</p>
             </div>
             <div class="post_info">
                 {{post.createTime}} 发布 | {{post.commentCount}}条评论
             </div>
         </article>
+        <div class="emptyList" v-if="postList && postList.length === 0">
+            <p>阿偶，暂时没有文章</p>
+        </div>
     </section>
 </template>
 <script>
@@ -19,27 +25,47 @@
 
     export default {
         asyncData({ store, router }) {
-            let username = 'ecizep';
-            if (router.currentRoute.name === 'userlist') {
-                username = router.currentRoute.params.username;
+            if (router.currentRoute.name === 'blog') {
+                return store.dispatch('getListOnServer', {
+                    username: router.currentRoute.params.username,
+                    categoryId: undefined
+                });
+            } else if (router.currentRoute.name === 'category') {
+                let categoryId = router.currentRoute.params.categoryId;
+                return store.dispatch('getListOnServer', {
+                    categoryId,
+                    username: undefined
+                });
+            } else {
+                return store.dispatch('getListOnServer', {
+                    username: 'ecizep',
+                    categoryId: undefined
+                });
             }
-            return store.dispatch('getListOnServer', username);
         },
         data() {
             return {}
         },
         mounted() {
-            if (this.postList.length === 0) {
-                let username = 'ecizep';
-                if (this.$route.name === 'userlist') {
-                    username = this.$route.params.username;
+            // ssr降级
+            if (!(this.postList instanceof Array)) {
+                if (this.$route.name === 'category') {
+                    getPostList(undefined, this.$route.params.categoryId).then(res => {
+                        if (res.data.code === 200) {
+                            this.$store.commit('setList', res.data.data);
+                            console.log('category page client render');
+                        }
+                    })
+                } else {
+                    let username = this.$route.params.username || 'ecizep';
+                    getPostList(username).then((res) => {
+                        if (res.status === 200) {
+                            this.$store.commit('setList', res.data.data);
+                            console.log('list page client render');
+                        }
+                    })
                 }
-                getPostList(username).then((res) => {
-                    if (res.status === 200) {
-                        this.$store.commit('setList', res.data.data);
-                        console.log('list page client render');
-                    }
-                })
+
             }
         },
         methods: {
@@ -60,6 +86,11 @@
                 set(newValue) {
                     this.$store.commit('setList', newValue);
                 }
+            },
+            category: {
+                get () {
+                    return this.$store.state.category;
+                }
             }
         }
     }
@@ -69,6 +100,15 @@
     @import url('../assets/css/mixin');
     .blog_home {
         padding: 0 30px;
+
+        .category_title {
+            font-size: 32px;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: @fontColorTitle;
+            text-align: center;
+            margin-bottom: 20px;
+        }
         .blog_post {
             padding-top: 24px;
             padding-bottom: 48px;
@@ -95,12 +135,22 @@
                     margin: 10px 0;
                     .ellipsisLn(3);
                 }
+                @media screen and (min-width: 1550px) {
+                    p {
+                        font-size: 18px;
+                    }
+                }
             }
             .post_info {
                 color: @fontColorInfo;
                 font-size: 14px;
                 padding-top: 10px;
             }
+        }
+        .emptyList {
+            color: @fontColorTitle;
+            font-size: 22px;
+            text-align: center;
         }
     }
 </style>

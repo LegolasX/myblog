@@ -130,6 +130,10 @@
                                 this.$toast({
                                     message: '删除分类成功'
                                 });
+                            } else if (res.data.code === 205) {
+                                this.$toast({
+                                    message: '当前分类下还有' + res.data.data + '篇文章，不允许直接删除分类'
+                                })
                             }
                         })
                     }
@@ -180,7 +184,6 @@
                 font-size: 0;
                 .table_button {
                     font-size: 20px;
-                    
                 }
             }
         }

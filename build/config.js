@@ -1,6 +1,6 @@
 const path = require('path');
-const devDomain = '//ecizep.com:3030'
-const productionDomain = '//140.143.164.218:3030'
+const devDomain = '//ecizep.com'
+const productionDomain = '//sunriseteam.cn'
 
 module.exports = {
     client: {

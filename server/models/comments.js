@@ -5,13 +5,20 @@ const COLLECTION = 'comments';
 module.exports = {
     addComment (comments) {
         // postId 类型转换
-        comments.postId = ObjectID(comments.postId);
+        if(!!comments.postId) {
+            comments.postId = ObjectID(comments.postId);
+        }
         return MongoManager.insertOne(COLLECTION, comments);
     },
     getCommentsByPostId (postId) {
         return MongoManager.find(COLLECTION, {
             postId: ObjectID(postId)
         });
+    },
+    getCommentsByUsername (username) {
+        return MongoManager.find(COLLECTION, {
+            username: username
+        })
     },
     voteOrDislikeComment (commentId, vote) {
         if (vote) {
@@ -58,6 +65,11 @@ module.exports = {
             $push: {
                 replyList: comment
             }
+        })
+    },
+    deleteCommentByPostId (postId) {
+        return MongoManager.remove(COLLECTION, {
+            postId: ObjectID(postId)
         })
     }
 }

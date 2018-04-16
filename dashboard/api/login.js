@@ -1,13 +1,13 @@
-import http from '../util/http';
-import Qs from 'qs';
-
-// 登录注册相关的api的baseUrl需要去掉/dashboard
-const instance = http.create({
-    baseURL: http.defaults.baseURL.replace(/\/dashboard/, '')
-});
+import {
+    http,
+    frontEndHttp
+} from '../util/http';
+import {
+    serializeParams
+} from '../util/util'
 
 export const login = (username, password) => {
-    return instance.post('login', Qs.stringify({
+    return frontEndHttp.post('login',serializeParams({
         username,
         password
     }))

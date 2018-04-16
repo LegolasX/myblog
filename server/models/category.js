@@ -6,6 +6,11 @@ module.exports = {
     addCategory (category) {
         return MongoManager.insertOne(COLLECTION, category);
     },
+    getCategoryById (categoryId) {
+        return MongoManager.findOne(COLLECTION, {
+            _id: ObjectID(categoryId)
+        })
+    },
     getCategoryByUsername (username) {
         return MongoManager.find(COLLECTION, {
             username

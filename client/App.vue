@@ -37,7 +37,7 @@
                 ripple.style.top = top + 'px';
                 ripple.style.left = left + 'px';
                 ripple.className += ' active';
-                console.log(ripple);
+                // console.log(ripple);
                 return false;
             }
         },
@@ -58,6 +58,22 @@
         padding: 40px;
         height: 100%;
         overflow-y: auto;
+    }
+
+    @media screen and (max-width: 960px) {
+        #app {
+            height: initial;
+        }
+        .blog-content {
+            margin-left: 0;
+            padding: 40px 15px;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .blog-content {
+            padding: 40px 8px;
+        }
     }
 
     button {
@@ -89,6 +105,20 @@
         to {
             transform: scale(2);
             opacity: 0;
+        }
+    }
+
+
+    .float_card {
+        margin: 0 auto;
+        border-radius: 10px;
+        box-shadow: 0 2px 2px rgba(0, 0, 0, 0.05), 0 15px 100px 0 rgba(0, 0, 75, 0.125);
+        transition: box-shadow ease-out .5s, opacity linear .3s;
+        transition-delay: .2s;
+        opacity: 0.75;
+        &:hover {
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.05), 0 15px 180px 0 rgba(0, 0, 50, 0.25);
+            opacity: 1;
         }
     }
 </style>

@@ -8,11 +8,11 @@
             </div>
             <div class="category_wrapper">
                 <mu-list>
-                    <mu-list-item title="Moments" @click="changeTab(0)">
+                    <mu-list-item title="Moments">
                         <span class="icon-instagram" slot="left" style="font-size: 125%"></span>
                         <span slot="right">40</span>
                     </mu-list-item>
-                    <mu-list-item title="Article" toggleNested @click="changeTab(1)">
+                    <mu-list-item title="Article" toggleNested>
                         <span class="icon-paper-plane" slot="left"></span>
                         <div class="second_list" slot="nested">
                             <mu-list-item :class="{active: $route.name === 'createArticle'}" title="发表文章" @click="changeRouter('createArticle')">
@@ -21,17 +21,17 @@
                             <mu-list-item :class="{active: $route.name === 'categoryArticle'}" title="分类管理" @click="changeRouter('categoryArticle')">
                                 <span class="icon-paper-plane" slot="left"  style="opacity:0"></span>
                             </mu-list-item>
-                            <mu-list-item title="文章列表">
+                            <mu-list-item :class="{active: $route.name === 'articleList'}" title="文章列表" @click="changeRouter('articleList')">
                                 <span class="icon-paper-plane" slot="left"  style="opacity:0"></span>
                                 <span slot="right">40</span>
                             </mu-list-item>
                         </div>
                     </mu-list-item>
-                    <mu-list-item title="Photos"  :class="{active: tabIndex === 2}" @click="changeTab(2)">
+                    <mu-list-item title="Photos" :class="{active: $route.name === 'photos'}"  @click="changeRouter('photos')">
                         <span class="icon-image" slot="left"></span>
                         <span slot="right">34</span>
                     </mu-list-item>
-                    <mu-list-item title="Settings"  :class="{active: tabIndex === 3}" @click="changeTab(3)">
+                    <mu-list-item title="Settings">
                         <span class="icon-cogs" slot="left"></span>
                         <span slot="right">19</span>
                     </mu-list-item>

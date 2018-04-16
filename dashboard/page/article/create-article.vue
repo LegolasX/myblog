@@ -13,13 +13,7 @@
             <div class="panel_cell">
                 <mu-text-field v-model="article.description"  label="文章描述" hintText="请输入文章的简要描述，不超过200个字符" multiLine :rows="3" :max-length="200" :label-float="true" :full-width="true"/>
             </div>
-            
-            <input type="file" name="photo" @change="fileUpload">
-            <mu-raised-button label="添加分类" @click="posttest" labelPosition="after">
-                <span class="icon-plus-circle icon_raised_button"></span>
-            </mu-raised-button>
-            <!-- <mu-switch label="公开发表" v-model="isPublic" labelLeft class="switch" /> -->
-            <mu-raised-button label="发表文章" @click="submitPost" labelPosition="after">
+            <mu-raised-button :label="$route.query.postId ? '更新文章' : '发表文章'" @click="submitPost">
             </mu-raised-button>
         </mu-paper>
         <div class="editorContainer">
@@ -34,22 +28,28 @@
     </div>
 </template>
 <script>
-    import http from '../../util/http';
+    import {
+        http
+    } from '../../util/http';
     import muDatePicker from 'muse-ui/src/datePicker/index';
     import muTextField from 'muse-ui/src/textField/textField.vue';
     import muPaper from 'muse-ui/src/paper/index';
     import muSelectField from 'muse-ui/src/selectField/index';
-    import muRaisedButton from 'muse-ui/src/raisedButton/index';
     import muMenuItem from 'muse-ui/src/menu/menuItem.vue';
-    import muSwitch from 'muse-ui/src/switch/index';
+    import muRaisedButton from 'muse-ui/src/raisedButton/index';
     import muTimePicker from 'muse-ui/src/timePicker/index';
     import editor from '../../components/editor/editor.vue';
     import {
         getCategory
     } from '../../api/category';
     import {
-        createPost
+        createPost,
+        getPostById,
+        updatePost
     } from '../../api/post';
+    import {
+        formatDate
+    } from '../../util/util.js'
 
     function getDate() {
         let now = new Date();
@@ -85,7 +85,6 @@
                     title: ''
                 },
                 isPublic: true,
-                currentPic: null,
                 categoryList: [],
                 // 编辑器内容
                 editorContent: {
@@ -104,29 +103,55 @@
                         message: '获取分类列表失败，请重试'
                     })
                 }
-            })
+            });
+            if (this.$route.query.postId) {
+                getPostById(this.$route.query.postId).then(res => {
+                    let post = res.data.data.post;
+                    this.article.createTime = post.createTime;
+                    let date = formatDate(post.createTime);
+                    this.article.date = date.date;
+                    this.article.time = date.time;
+                    this.article.title = post.title;
+                    this.article.description = post.description;
+                    this.article.categoryId = post.categoryId;
+                    this.editorContent.mdValue = post.markdown;
+                    this.editorContent.htmlValue = post.content;
+                });
+            }
         },
         methods: {
             submitPost () {
                 let postParams = Object.assign({}, this.article);
+                let dateArray = postParams.date.split('-');
+                // 月份从0开始，减1
+                dateArray[1] = (parseInt(dateArray[1]) - 1).toString();
+                postParams.createTime = new Date(...dateArray, ...postParams.time.split(':')).valueOf();
                 delete postParams.date;
                 delete postParams.time;
                 postParams.markdown = this.editorContent.mdValue;
-                createPost(postParams).then(res => {
-                    console.log(res);
-                });
-            },
-            posttest () {
-                let formData = new FormData();
-                formData.append('cover', this.currentPic);
-                http.post('/upload', formData).then(res => {
-                    console.log(res);
-                })
-            },
-            fileUpload (event) {
-                this.currentPic = event.target.files[0];
-                console.log(this.currentPic);
-
+                if (!postParams.title || !postParams.markdown || !postParams.categoryId) {
+                    this.$toast({
+                        message: '标题，内容以及分类不能为空'
+                    });
+                    return void 666;
+                }
+                if (this.$route.query.postId) {
+                    updatePost(this.$route.query.postId, postParams).then(res => {
+                        if (res.data.code === 200) {
+                            this.$toast({
+                                message: '更新成功'
+                            });
+                        }
+                    })
+                } else {
+                    createPost(postParams).then(res => {
+                        if (res.data.code === 200) {
+                            this.$toast({
+                                message: '发表成功'
+                            });
+                        }
+                    });
+                }
             },
             childEventHandler: function (res) {
                 // res会传回一个data,包含属性mdValue和htmlValue，具体含义请自行翻译
@@ -140,13 +165,12 @@
             muMenuItem,
             muDatePicker,
             muTimePicker,
-            muSwitch,
             muRaisedButton,
             editor
         }
     }
 </script>
-<style lang="less" scoped>
+<style lang="less" scope>
     .create_article {
         h2 {
             font-size: 24px;
@@ -158,7 +182,6 @@
                 display: flex;
                 justify-content: space-between;
                 .cell_inline {
-                    width: 33%;
                     vertical-align: top;
                 }
                 font-size: 0;

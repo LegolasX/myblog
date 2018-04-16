@@ -1,9 +1,16 @@
 import http from '../util/http';
-import Qs from 'qs';
+import {
+    serializeParams
+} from '../util/util.js'
 
 // 请求博客文章列表
-export const getPostList = (username) => {
-    return http.get(`/postList/${username}`);
+export const getPostList = (username, categoryId) => {
+    return http.get('/postList', {
+        params: {
+            username,
+            categoryId
+        }
+    });
 };
 
 // 根据postId请求文章
@@ -14,7 +21,7 @@ export const getPosition = () => http.get('http://int.dpool.sina.com.cn/iplookup
 
 // 添加新评论
 export const addComment = (comment) => {
-    return http.post('/comment', Qs.stringify(comment));
+    return http.post('/comment', serializeParams(comment));
 }
 
 // 获取评论
@@ -22,6 +29,14 @@ export const getCommentList = (postId) => {
     return http.get('/comment', {
         params: {
             postId
+        }
+    })
+}
+
+export const getBBSCommentList = (username) => {
+    return http.get('/comment', {
+        params: {
+            username
         }
     })
 }
@@ -40,5 +55,5 @@ export const cancelVoteOrDislike = (commentId, vote) => {
 
 // 回复评论
 export const replyComment = (comment) => {
-    return http.post('/comment/reply', Qs.stringify(comment));
+    return http.post('/comment/reply', serializeParams(comment));
 }

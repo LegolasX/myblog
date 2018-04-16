@@ -2,11 +2,20 @@ const express = require('express');
 const router = express.Router();
 const posts = require('../models/posts');
 const comments = require('../models/comments');
+const categorys = require('../models/category');
 const User = require('../models/users');
 const CORS = require('../middleware/cors');
 
 const dashboardRouter = require('./dashboard');
 const checkLogin = require('../middleware/checklogin');
+const {
+    res204,
+    res500
+} = require('../util/statusResponce')
+
+let {
+    formateDate
+} = require('../util/util.js');
 
 // 后台需要验证登录的接口
 router.use('/dashboard', CORS, checkLogin, dashboardRouter);
@@ -26,11 +35,7 @@ router.post('/login', CORS, function (req, res, next) {
                 data: null
             });
         } else {
-            res.json({
-                code: 204,
-                message: 'login failed',
-                data: null
-            });
+            res500(res);
         }
     })
 })
@@ -41,31 +46,46 @@ router.post('/login', CORS, function (req, res, next) {
 
 // 根据postId获取post
 router.get('/post/:postId', CORS, function (req, res, next) {
-    posts.getPostById(req.params.postId).then(post => {
+    Promise.all([posts.getPostById(req.params.postId), posts.getNextPostById(req.params.postId)]).then(([post, nextPost]) => {
+        if (nextPost.length > 0) {
+            nextPost = nextPost[nextPost.length - 1];
+        } else {
+            nextPost = null
+        }
         post.postId = post._id;
         delete post._id;
         res.json({
             code: 200,
-            data: post,
+            data: {
+                post,
+                nextPost: !nextPost ? null : {
+                    postId: nextPost._id,
+                    title: nextPost.title,
+                    description: nextPost.description
+                }
+            },
             message: 'OK'
         });
-    });
+    })
 })
 
 // 根据用户名获取postList
-router.get('/postList/:username', CORS, function (req, res, next) {
-    if (req.params.username !== undefined) {
+router.get('/postList', CORS, function (req, res, next) {
+    if (!!req.query.username) {
         let postList = [];
-        posts.getPostByUsername(req.params.username).then(data => {
+        posts.getPostByUsername(req.query.username).then(data => {
             let promiseList = [];
             postList = data;
+            postList.sort(function (a, b) {
+                return parseInt(b.createTime) - parseInt(a.createTime);
+            })
             postList.forEach((post, index) => {
                 post.postId = post._id;
                 delete post._id;
                 promiseList.push(comments.getCommentsByPostId(post.postId));
                 if (post.createTime) {
-                    let time = new Date(parseInt(post.createTime));
-                    post.createTime = `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}`;
+                    let time = formateDate(post.createTime);
+                    post.createTime = time.date;
                 }
             });
             return Promise.all(promiseList);
@@ -76,6 +96,40 @@ router.get('/postList/:username', CORS, function (req, res, next) {
             res.json({
                 code: 200,
                 data: postList,
+                message: 'OK'
+            });
+        });
+    } else if (!!req.query.categoryId) {
+        let postList = [];
+        posts.getPostByCategoryId(req.query.categoryId).then(data => {
+            let promiseList = [];
+            promiseList.push(categorys.getCategoryById(req.query.categoryId));
+            postList = data;
+            postList.sort(function (a, b) {
+                return parseInt(b.createTime) - parseInt(a.createTime);
+            })
+            postList.forEach((post, index) => {
+                post.postId = post._id;
+                delete post._id;
+                promiseList.push(comments.getCommentsByPostId(post.postId));
+                if (post.createTime) {
+                    let time = formateDate(post.createTime);
+                    post.createTime = time.date;
+                }
+            });
+            return Promise.all(promiseList);
+        }).then(([category, ...dataArray]) => {
+            category.categoryId = category._id;
+            delete category._id;
+            postList.forEach((post, index) => {
+                post.commentCount = dataArray[index].length;
+            });
+            res.json({
+                code: 200,
+                data: {
+                    postList,
+                    category
+                },
                 message: 'OK'
             });
         });
@@ -95,13 +149,16 @@ router.get('/postList/:username', CORS, function (req, res, next) {
 
 // 添加评论
 router.post('/comment', CORS, function (req, res, next) {
-    if (!req.body.postId || !req.body.comment) {
+    if ((!req.body.username && !req.body.postId) || !req.body.comment) {
         res.json({
             code: 204,
             data: null,
             message: 'lack of params'
         });
     }
+    // 初始化相关参数
+    req.body.dislikeCount = 0;
+    req.body.voteCount = 0;
     comments.addComment(req.body).then(result => {
         if (result.insertedCount === 1) {
             res.json({
@@ -124,14 +181,27 @@ router.post('/comment', CORS, function (req, res, next) {
 })
 
 router.get('/comment', CORS, function (req, res) {
-    if (req.query.postId === undefined) {
-        res.json({
-            code: 203,
-            data: null,
-            message: 'lack of params'
-        });
-    } else {
+    if (!!req.query.postId) {
         comments.getCommentsByPostId(req.query.postId).then(commentList => {
+            commentList.forEach((comment) => {
+                comment.commentId = comment._id;
+                delete comment._id;
+                comment.replyList && comment.replyList.sort(function (a, b) {
+                    return parseInt(b.commentTime) - parseInt(a.commentTime); 
+                });
+            });
+            commentList.sort(function (a, b) {
+                return parseInt(b.commentTime) - parseInt(a.commentTime); 
+            });
+            res.json({
+                code: 200,
+                data: commentList,
+                message: 'OK'
+            })
+        });
+    } else if (!!req.query.username) {
+        // 留言板
+        comments.getCommentsByUsername(req.query.username).then(commentList => {
             commentList.forEach((comment) => {
                 comment.commentId = comment._id;
                 delete comment._id;

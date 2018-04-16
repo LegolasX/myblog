@@ -135,6 +135,6 @@ function bundleRender (req, res) {
     });
 }
 
-app.listen(3030, function () {
-    console.log('server is starting at port 3030');
+app.listen(config.port, function () {
+    console.log('server is starting at port ' + config.port);
 });

@@ -4,29 +4,13 @@ const path = require('path');
 const fs = require('fs');
 const posts = require('../models/posts.js');
 const category = require('../models/category.js');
+const comments = require('../models/comments.js');
 const marked = require('marked');
 const getUploadToken = require('../lib/qiniu').getUploadToken;
-/* 
-其实这篇文章只是用来测试的，我也不知道应该打一些什么字
-所以各位看看就好
-不会要介意喔
+let {
+    formateDate
+} = require('../util/util.js');
 
-## what's up man?
-其实这篇文章**只是用来测试**的，我也不知道应该打一些*什么字*  
-所以`各位看看就好`  
-不会要介意喔
-> fist of all
-
-* diyi
-* dier
-* disan
-
-
-1. fds
-2. dsf
-3. dsfa
-
-*/
 let multer  = require('multer')
 let upload = multer({
     dest: path.resolve(__dirname, '../upload/')
@@ -37,6 +21,14 @@ function resLackParams (res) {
         code: 204,
         message: 'lack of params',
         data: null
+    });
+}
+
+function res500 (res) {
+    res.json({
+        code: 500,
+        data: null,
+        message: 'server error'
     });
 }
 
@@ -69,7 +61,7 @@ router.post('/post', function (req, res, next) {
     if (!!req.body.markdown && !!req.body.categoryId) {
         req.body.content = marked(req.body.markdown);
         req.body.username = req.session.username;
-        req.body.userView = 0;
+        req.body.pageview = 0;
         posts.createPost(req.body).then((result) => {
             if (result.insertedCount === 1) {
                 res.json({
@@ -89,6 +81,78 @@ router.post('/post', function (req, res, next) {
         resLackParams(res);
     }
 });
+
+// 根据用户名获取postList
+router.get('/postList', function (req, res, next) {
+    let username = req.session.username;
+    let postList = [];
+    posts.getPostByUsername(username).then(data => {
+        let promiseList = [];
+        postList = data;
+        postList.forEach((post, index) => {
+            post.postId = post._id;
+            delete post._id;
+            promiseList.push(comments.getCommentsByPostId(post.postId));
+            if (post.createTime) {
+                let time = formateDate(post.createTime);
+                post.createTime = time.date;
+            }
+        });
+        return Promise.all(promiseList);
+    }).then(dataArray => {
+        postList.forEach((post, index) => {
+            post.commentCount = dataArray[index].length;
+        });
+        res.json({
+            code: 200,
+            data: postList,
+            message: 'OK'
+        });
+    });
+})
+
+// 更新post
+router.put('/post/:postId', function (req, res) {
+    if (!!req.body.markdown && !!req.body.categoryId && !!req.params.postId) {
+        req.body.content = marked(req.body.markdown);
+        req.body.username = req.session.username;
+        posts.updatePost(req.params.postId, req.body).then(result => {
+            if (result.lastErrorObject.updatedExisting && !!result.value) {
+                res.json({
+                    code: 200,
+                    message: 'update post success',
+                    data: null
+                });
+            } else {
+                res500(res);
+            }
+        });
+    } else {
+        resLackParams(res);
+    }
+})
+
+// 删除post
+router.delete('/post/:postId', function (req, res) {
+    if (!!req.params.postId) {
+        posts.deletePost(req.params.postId).then(result => {
+            comments.deleteCommentByPostId(req.params.postId).then(result => {
+                console.log(`删除postId:${req.params.postId}下${result.result.n}条评论`);
+            })
+            if (result.result.n === 1) {
+                res.json({
+                    code: 200,
+                    message: 'delete post success',
+                    data: null
+                });
+            } else {
+                res500(res);
+            }
+        })
+    } else {
+        resLackParams(res);
+    }
+})
 
 // 获取分类列表
 router.get('/category', function (req, res) {
@@ -184,21 +248,32 @@ router.put('/category/:categoryId', function (req, res) {
 // 删除分类
 router.delete('/category/:categoryId', function (req, res) {
     if (!!req.params.categoryId) {
-        category.deleteCategoryById(req.params.categoryId).then(result => {
-            if (result.result.n === 1) {
+        posts.getPostByCategoryId(req.params.categoryId).then(result => {
+            if (result.length > 0) {
                 res.json({
-                    code: 200,
-                    message: 'delete category success',
-                    data: null
-                })
+                    code: 205,
+                    message: 'posts not empty',
+                    data: result.length
+                });
             } else {
-                res.json({
-                    code: 500,
-                    message: 'mongo error',
-                    data: null
+                category.deleteCategoryById(req.params.categoryId).then(result => {
+                    if (result.result.n === 1) {
+                        res.json({
+                            code: 200,
+                            message: 'delete category success',
+                            data: null
+                        })
+                    } else {
+                        res.json({
+                            code: 500,
+                            message: 'mongo error',
+                            data: null
+                        })
+                    }
                 })
             }
         })
+        /* */
     } else {
         res.json({
             code: 204,

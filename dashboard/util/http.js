@@ -13,9 +13,18 @@ axios.interceptors.response.use(function (response) {
     if (response.status === 200 && response.data.code === 203) {
         let returnUrl = location.href;
         location.href = location.origin + '/dashboard#/login?returnUrl=' + encodeURIComponent(returnUrl)
+        
     } else {
         return response;
     }
 })
 
-export default axios;
+// 登录注册相关的api的baseUrl需要去掉/dashboard
+const frontEndHttp = axios.create({
+    baseURL: axios.defaults.baseURL.replace(/\/dashboard/, '')
+});
+
+export {
+    axios as http,
+    frontEndHttp
+}

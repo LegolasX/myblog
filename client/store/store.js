@@ -8,38 +8,83 @@ import config from '../../build/config';
     getPostById
 } from '../api/api.js' */
 
+const isProd = process.env.NODE_ENV === 'production';
+let baseUrl = 'http:';
+if (isProd) {
+    baseUrl += config.client.production.apiBaseUrl;
+} else {
+    baseUrl += config.client.dev.apiBaseUrl;
+}
+
 export function createStore() {
     return new Vuex.Store({
         state: {
-            postList: [],
-            post: {}
+            postList: null,
+            category: null,
+            post: {},
+            nextPost: {},
+            BBSCommentList: []
         },
         mutations: {
             setList (state, list) {
                 state.postList = list;
             },
-            setPostContent (state, post) {
-                state.post = post;
+            setCategory (state, category) {
+                state.category = category;
+            },
+            setPostContent (state, data) {
+                state.post = data.post || state.post;
+                state.nextPost = data.nextPost || state.nextPost;
+            },
+            setBBSCommentList (state, BBSCommentList) {
+                state.BBSCommentList = BBSCommentList;
             }
         },
         actions: {
-            getListOnServer ({commit}, username) {
-                const isProd = process.env.NODE_ENV === 'production';
-                let url = 'http:';
-                if (isProd) {
-                    url += config.client.production.apiBaseUrl + 'postLost/' + username;
-                } else {
-                    url += config.client.dev.apiBaseUrl + 'postLost/' + username;
-                }
-                return axios.get(url).then(res => {
-                    console.log('server request postList ' + username);
-                    commit('setList', res.data.data);
+            getListOnServer ({commit}, payload) {
+                return axios.get(`${baseUrl}postList`, {
+                    params: {
+                        username: payload.username,
+                        categoryId: payload.categoryId
+                    }
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        console.log('server request postList success ' + payload.username + payload.categoryId);
+                        let postList = !!payload.categoryId ? res.data.data.postList : res.data.data;
+                        if (!!payload.categoryId) {
+                            postList = res.data.data.postList;
+                            commit('setCategory', res.data.data.category)
+                        } else {
+                            postList = res.data.data
+                        }
+                        commit('setList', postList);
+                    } else {
+                        console.log('server reques postList fail: ' + payload.username + payload.categoryId);
+                    }
                 })
             },
             getPostOnServer ({commit}, postId) {
-                return axios.get('http://localhost:3030/api/post/' + postId).then(res => {
-                    console.log('server requeset post');
-                    commit('setPostContent', res.data.data);
+                return axios.get(baseUrl + 'post/' + postId).then(res => {
+                    if (res.data.code === 200) {
+                        console.log('server requeset post success');
+                        commit('setPostContent', res.data.data);
+                    } else {
+                        console.log('server requeset post fail ' + postId);
+                    }
+                })
+            },
+            getBBSCommentOnServer ({commit}, username) {
+                return axios.get(baseUrl + 'comment', {
+                    params: {
+                        username
+                    }
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        console.log('server request bbs commentlist');
+                        commit('setBBSCommentList', res.data.data);
+                    } else {
+                        console.log('server request bbs commentlist fail: ' + username);
+                    }
                 })
             }
         }

@@ -11,7 +11,8 @@ export default context => {
             console.log('matchedComponents length:' + matchedComponents.length);
             if (!matchedComponents.length) {
                 reject({
-                    code: 404
+                    code: 404,
+                    message: 'not match component'
                 });
             } else {
                 // 预取数据

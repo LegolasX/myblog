@@ -13,18 +13,28 @@ export function createRouter () {
             path: '/',
             component: list
         }, {
-            name: 'userlist',
-            path: '/user/:username',
+            name: 'blog',
+            path: '/blog/:username',
             component: list
-        },{
+        }, {
+            name: 'category',
+            path: '/category/:categoryId',
+            component: list
+        }, {
             name: 'post',
             path: '/post/:postId',
             component: () => import(
                 /* webpackChunkName: "post" */
                 '../page/post.vue'
             )
-        },
-        {
+        }, {
+            name: 'bbs',
+            path: '/bbs/:username',
+            component: () => import(
+                /* webpackChunkName: "bbs" */
+                '../page/bbs.vue'
+            )
+        }, {
             path: '*',
             redirect: '/'
         }]

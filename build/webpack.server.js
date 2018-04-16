@@ -23,7 +23,7 @@ serverBundleConfig = Object.assign({}, baseConfig, {
         new webpack.BannerPlugin(new Date().getFullYear() + '年' + parseInt(new Date().getMonth() + 1, 10) + '月' + new Date().getDate() + '日' + new Date().getHours() + '点' + new Date().getMinutes() + '分' + '编译'),
         new webpack.DefinePlugin({
             'process.env': {
-                NODE_ENV: '"production"'
+                NODE_ENV: isProd ? '"production"' : '"development"'
             }
         }),
         new vueSSRServerPlugin()
