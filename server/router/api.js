@@ -21,7 +21,7 @@ let {
 router.use('/dashboard', CORS, checkLogin, dashboardRouter);
 
 
-router.get('/iOSInfo', function (res, req) {
+router.get('/iOSInfo', function (req, res) {
     res.json({
         code: 200,
         data: {
