@@ -21,6 +21,16 @@ let {
 router.use('/dashboard', CORS, checkLogin, dashboardRouter);
 
 
+router.get('/iOSInfo', function (res, req) {
+    res.json({
+        code: 200,
+        data: {
+            shouldShow: false,
+            url: 'http://140.143.164.218/post/5ad40fd6825ccf3095579b44'
+        },
+        message: 'success'
+    });
+})
 /* 
     登录注册相关
 */
