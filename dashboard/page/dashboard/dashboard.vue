@@ -1,14 +1,16 @@
 <template>
     <div>
-        dashboard main page
+        <div @click="show = !show">dashboard main page</div> 
+        <mudialog :show="show">
+        </mudialog>
     </div>
 </template>
 <script>
-
+    import mudialog from '../../components/dialog/dialog.vue'
     export default {
         data() {
             return {
-
+                show: false
             }
         },
         methods: {
@@ -17,6 +19,7 @@
             }
         },
         components: {
+            mudialog
         }
     }
 </script>

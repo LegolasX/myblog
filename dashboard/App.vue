@@ -13,6 +13,7 @@
 <script>
     import dashHeader from './components/header/header.vue';
     import muLinearProgress from 'muse-ui/src/linearProgress/index';
+    
     export default {
         data() {
             return {

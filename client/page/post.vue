@@ -16,7 +16,7 @@
                 <p>{{nextPost.description}}</p>
             </article>
         </section>
-        <comment :data-list="commentList" @commentSubmit="commentSubmit"/>
+        <comment :data-list="commentList" @comment="commentSubmit"/>
     </div>
 </template>
 <script>

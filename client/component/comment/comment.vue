@@ -99,7 +99,8 @@
                         this.$set(comment, 'replyList', []);
                     }
                 });
-            } 
+            }
+
         },
         mounted () {
             // 客户端混入后状态更新
@@ -147,7 +148,7 @@
                 }
                 // 更新用户信息，存储到本地
                 storageManager.setUserInfo(this.userInfo);
-                this.$emit('commentSubmit', comment, commentId, this.commentList);
+                this.$emit('comment', comment, commentId, this.commentList);
                 this.comment = ''
             },
             voteOrDislikeComment (comment, vote) {

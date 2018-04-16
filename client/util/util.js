@@ -5,7 +5,7 @@ export const serializeParams = (obj) => {
     let result = '';
     let first = true;
     for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
+        if (obj.hasOwnProperty(key) && !!obj[key]) {
             if (!first) {
                 result += '&';
             }
