@@ -1,3 +1,5 @@
+const auth = require('./auth');
+
 module.exports = {
     port: 80,
     session: {
@@ -7,7 +9,7 @@ module.exports = {
         domain: process.env.NODE_ENV === 'production' ? 'sunriseteam.cn' : 'ecizep.com'
     },
     mongodb: {
-        url: 'mongodb://127.0.0.1:27017',
+        url: `mongodb://${auth.user}:${auth.password}@127.0.0.1:27017/blog`,
         port: 27017,
         dbName: 'blog'
     },

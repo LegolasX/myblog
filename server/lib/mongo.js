@@ -1,5 +1,6 @@
 const config = require('../config/default');
 const mongodb = require('mongodb');
+const auth = require('./../config/auth');
 
 let MongoManager = {
     _db: null,
