@@ -25,7 +25,7 @@ router.get('/iOSInfo', function (req, res) {
     res.json({
         code: 200,
         data: {
-            shouldShow: false,
+            shouldShow: true,
             url: 'http://140.143.164.218/post/5ad40fd6825ccf3095579b44'
         },
         message: 'success'
