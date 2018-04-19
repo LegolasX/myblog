@@ -92,7 +92,7 @@ app.use('/dashboard',  function (req, res, next) {
     console.log(req.baseUrl);
     if (req.baseUrl === '/dashboard') {
         res.setHeader('Content-Type', 'text/html');
-        res.sendFile(path.resolve(__dirname, './dashboard.html'));
+        res.sendFile(path.resolve(__dirname, '../static/dashboard/dashboard.html'));
     } else {
         res.end('404');
     }

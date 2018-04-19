@@ -55,7 +55,7 @@
     .blog-content {
         box-sizing: border-box;
         margin-left: 33.3%;
-        padding: 40px;
+        padding: 40px 25px;
         height: 100%;
         overflow-y: auto;
     }
@@ -72,7 +72,7 @@
 
     @media screen and (max-width: 480px) {
         .blog-content {
-            padding: 40px 8px;
+            padding: 40px 10px;
         }
     }
 

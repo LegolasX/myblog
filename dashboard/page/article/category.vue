@@ -3,7 +3,7 @@
         <h2>分类管理</h2>
         <mu-paper :zDepth="2" class="paper_panel">
             <mu-raised-button label="添加分类" @click="categoryAction(0)" labelPosition="after">
-                <span class="icon-plus-circle icon_raised_button"></span>
+                <span class="icon-plus-circle icon_raised_button mu-icon"></span>
             </mu-raised-button>
             <mu-table multiSelectable enableSelectAll ref="table">
                 <mu-thead>

@@ -231,6 +231,11 @@
     @import url('../../assets/css/const.less');
     .comment {
         margin-top: 70px;
+        padding: 0 10px;
+
+        @media screen and (max-width: 480px) {
+            padding: 0;
+        }
     }
 
     .add_comment {

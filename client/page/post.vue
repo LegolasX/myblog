@@ -1,6 +1,6 @@
 <template>
     <div class="blog_post">
-        <section>
+        <section class="post_section">
             <header class="post-title">
                 <h1>{{post.title}}</h1>
             </header>
@@ -160,6 +160,9 @@
 </script>
 <style lang="less">
     @import url('../assets/css/theme.less');
+    .post_section {
+        padding: 0 20px;
+    }
     .next_post {
         color: @fontColorInfo;
         text-align: center;
