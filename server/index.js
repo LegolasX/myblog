@@ -118,10 +118,9 @@ app.get('*', (req, res, next) => {
 });
 
 function bundleRender (req, res) {
-
     const context = {
         url: req.url,
-        title: 'vue 服务端渲染实践'
+        title: ''
     };
 
     bundleRenderer.renderToString(context, (err, html) => {

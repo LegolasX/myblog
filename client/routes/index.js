@@ -11,11 +11,17 @@ export function createRouter () {
         routes: [{
             name: 'list',
             path: '/',
-            component: list
+            component: list,
+            meta: {
+                title: '博客主页'
+            }
         }, {
             name: 'blog',
             path: '/blog/:username',
-            component: list
+            component: list,
+            meta: {
+                title: '博客主页'
+            }
         }, {
             name: 'category',
             path: '/category/:categoryId',
@@ -33,7 +39,10 @@ export function createRouter () {
             component: () => import(
                 /* webpackChunkName: "bbs" */
                 '../page/bbs.vue'
-            )
+            ),
+            meta: {
+                title: '留言板'
+            }
         }, {
             path: '*',
             redirect: '/'

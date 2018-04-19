@@ -18,3 +18,19 @@ export const serializeParams = (obj) => {
     }
     return result;
 }
+
+export function isWX() {
+    return /micromessenger/i.test(navigator.userAgent);
+}
+
+export function isAndroid() {
+    let UA = navigator.userAgent;
+    let isAndroid = UA.indexOf('Android') > -1 || UA.indexOf('Adr') > -1;
+    return isAndroid;
+}
+
+export function isiOS() {
+    let UA = navigator.userAgent;
+    let isiOS = !!UA.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+    return isiOS;
+}

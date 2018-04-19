@@ -20,7 +20,8 @@
     </div>
 </template>
 <script>
-    import comment from '../component/comment/comment'
+    import comment from '../component/comment/comment';
+    import setTitle from '../util/setTitle';
     import {
         getPostById,
         getposition,
@@ -70,6 +71,8 @@
                 // 浏览器环境
                 if (!this.post.title) {
                     this.getPostById(this.$route.params.postId);
+                } else {
+                    setTitle(this.post.title);
                 }
                 this.getComments(this.$route.params.postId);
             }
@@ -105,6 +108,7 @@
                     if (res.status = 200) {
                         this.post = res.data.data.post;
                         this.nextPost = res.data.data.nextPost || {};
+                        setTitle(this.post.title);
                         console.log('post page client render');
                     }
                 })
