@@ -26,7 +26,7 @@ router.get('/iOSInfo', function (req, res) {
         code: 200,
         data: {
             shouldShow: true,
-            url: 'http://140.143.164.218/post/5ad40fd6825ccf3095579b44'
+            url: 'http://sunriseteam.cn/post/5ad40fd6825ccf3095579b44'
         },
         message: 'success'
     });
