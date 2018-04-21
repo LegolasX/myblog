@@ -56,6 +56,11 @@ router.post('/upload', upload.single('cover'), function (req, res) {
     }
 })
 
+
+// 个人资料
+router.get('/profile', function (req, res) {
+    
+})
 // 创建post
 router.post('/post', function (req, res, next) {
     if (!!req.body.markdown && !!req.body.categoryId) {

@@ -5,7 +5,9 @@
             <mu-linear-progress v-if="inProgress" />
             <dash-header/>
             <section class="content_wrapper">
-                <router-view></router-view>
+                <transition :name="transitionName">
+                    <router-view></router-view>
+                </transition>
             </section>
         </div>
     </div>
@@ -17,7 +19,17 @@
     export default {
         data() {
             return {
-                inProgress: false
+                inProgress: false,
+                transitionName: 'fade'
+            }
+        },
+        watch: {
+            $route: function (to, from) {
+                if (to.name === 'setting' || from.name === 'setting') {
+                    this.transitionName = 'bottomup';
+                } else {
+                    this.transitionName = 'fade'
+                }
             }
         },
         methods: {
@@ -43,5 +55,14 @@
             padding: 40px 30px 0 380px;
             color:#68646d;
         }
+    }
+
+
+
+    .bottomup-enter, .bottomup-leave-to {
+        transform: translate(0, 100%)
+    }
+    .bottomup-enter-active, .bottomup-leave-active {
+        transition: transform 0.3s ease-in;
     }
 </style>

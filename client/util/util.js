@@ -12,7 +12,7 @@ export const serializeParams = (obj) => {
             if (typeof obj[key] === 'object') {
                 console.log('serializeParams Warning');
             }
-            result += key + '=' + obj[key].toString();
+            result += key + '=' + encodeURIComponent(obj[key].toString());
             first = false;
         }
     }

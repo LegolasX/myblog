@@ -41,6 +41,13 @@ export default [{
         '../page/photos/photos.vue'
     )
 }, {
+    name: 'setting',
+    path: '/setting',
+    component: () => import(
+        /* webpackChunkName: "photos" */
+        '../page/setting/setting.vue'
+    )
+}, {
     path: '*',
     redirect: '/'
 }]

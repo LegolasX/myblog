@@ -31,7 +31,7 @@
                         <span class="icon-image" slot="left"></span>
                         <span slot="right">34</span>
                     </mu-list-item>
-                    <mu-list-item title="Settings">
+                    <mu-list-item title="Settings" :class="{active: $route.name === 'setting'}"  @click="changeRouter('setting')">
                         <span class="icon-cogs" slot="left"></span>
                         <span slot="right">19</span>
                     </mu-list-item>
@@ -77,6 +77,7 @@
 <style lang="less">
     .dash_header {
         position: absolute;
+        z-index: 2;
         width: 300px;
         left: 0;
         top: 0;

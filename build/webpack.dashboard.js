@@ -39,8 +39,7 @@ dashboardConfig = Object.assign({}, baseConfig, {
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, '../server/dashboard.template.html'),
             filename: 'dashboard.html'
-        }),
-        new BundleAnalyzerPlugin()
+        })
     ]
 });
 

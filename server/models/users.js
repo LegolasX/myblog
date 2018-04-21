@@ -16,6 +16,14 @@ module.exports = {
             return MongoManager.insertOne(COLLECTION, user);
         }
     },
+    getUserProfile (username) {
+        return MongoManager.findOne(COLLECTION, {
+            username
+        });
+    },
+    updateUserProfile (username) {
+        
+    },
     login: async function (user) {
         let doc = await MongoManager.findOne(COLLECTION, {
             username: user.username,

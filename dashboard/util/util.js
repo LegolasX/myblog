@@ -5,14 +5,14 @@ export const serializeParams = (obj) => {
     let result = '';
     let first = true;
     for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
+        if (obj.hasOwnProperty(key) && !!obj[key]) {
             if (!first) {
                 result += '&';
             }
             if (typeof obj[key] === 'object') {
                 console.log('serializeParams Warning');
             }
-            result += key + '=' + obj[key].toString();
+            result += key + '=' + encodeURIComponent(obj[key].toString());
             first = false;
         }
     }

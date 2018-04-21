@@ -11,7 +11,7 @@
                 <mu-time-picker v-model="article.time" :auto-ok="true" class="cell_inline" label="发表时间" hintText="选择时间" mode="landscape" format="24hr"/>
             </div>
             <div class="panel_cell">
-                <mu-text-field v-model="article.description"  label="文章描述" hintText="请输入文章的简要描述，不超过200个字符" multiLine :rows="3" :max-length="200" :label-float="true" :full-width="true"/>
+                <mu-text-field v-model="article.description"  label="文章描述" hintText="请输入文章的简要描述，不超过200个字符" multiLine :rows="3" :max-length="200" :full-width="true"/>
             </div>
             <mu-raised-button :label="$route.query.postId ? '更新文章' : '发表文章'" @click="submitPost">
             </mu-raised-button>

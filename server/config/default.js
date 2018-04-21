@@ -1,7 +1,7 @@
 const auth = require('./auth');
 
 module.exports = {
-    port: 80,
+    port: 3030,
     session: {
         key: 'ECIZEP_SESSIONID',
         secret: 'lovelyy',
