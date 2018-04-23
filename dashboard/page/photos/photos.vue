@@ -2,13 +2,13 @@
     <div class="photos_wrapper">
         <h2>图片管理</h2>
         <input type="file" name="photo" @change="fileUpload">
+        <img :src="picUrl">
         <mu-raised-button label="添加分类" @click="posttest" labelPosition="after">
             <span class="icon-plus-circle icon_raised_button mu-icon"></span>
         </mu-raised-button>
     </div>
 </template>
 <script>
-    import * as qiniu from 'qiniu-js';
     import {
         getUploadToken
     } from '../../api/photo';
@@ -18,7 +18,8 @@
         data() {
             return {
                 currentPic: null,
-                uploadToken: null
+                uploadToken: null,
+                picUrl: null
             }
         },
         created () {
@@ -56,6 +57,8 @@
             },
             fileUpload (event) {
                 this.currentPic = event.target.files[0];
+                this.picUrl = window.URL.createObjectURL(this.currentPic);
+
                 console.log(this.currentPic);
             }
         },

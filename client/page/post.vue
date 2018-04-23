@@ -67,7 +67,7 @@
             }
         },
         created () {
-            if (typeof window === 'object') {
+            if (process.env.VUE_ENV === 'client') {
                 // 浏览器环境
                 if (!this.post.title) {
                     this.getPostById(this.$route.params.postId);

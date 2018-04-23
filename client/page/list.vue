@@ -4,13 +4,11 @@
             分类：{{category ? category.categoryName : ''}}
         </h1>
         <article class="blog_post" v-for="post in postList" :key="post.postId">
-            <img class="post_image" :src="post.imageUrl" @click="gotoPost(post.postId)">
+            <div class="post_image" :style="{backgroundImage: post.coverUrl ? 'url(' + post.coverUrl + ')' : ''}" @click="gotoPost(post.postId)"></div>
             <div class="post_title" @click="gotoPost(post.postId)">
                 <h2>{{post.title}}</h2>
                 <p>{{post.description}}</p>
-            </div>
-            <div class="post_info">
-                {{post.createTime}} 发布 | {{post.commentCount}}条评论
+                <div class="post_info">{{post.createTime}} 发布 | {{post.commentCount}}条评论</div>
             </div>
         </article>
         <div class="emptyList" v-if="postList && postList.length === 0">
@@ -36,11 +34,6 @@
                     categoryId,
                     username: undefined
                 });
-            } else {
-                return store.dispatch('getListOnServer', {
-                    username: 'ecizep',
-                    categoryId: undefined
-                });
             }
         },
         data() {
@@ -56,8 +49,8 @@
                             console.log('category page client render');
                         }
                     })
-                } else {
-                    let username = this.$route.params.username || 'ecizep';
+                } else if (this.$route.name === 'blog') {
+                    let username = this.$route.params.username;
                     getPostList(username).then((res) => {
                         if (res.status === 200) {
                             this.$store.commit('setList', res.data.data);
@@ -95,7 +88,7 @@
         }
     }
 </script>
-<style lang="less" scoped>
+<style lang="less">
     @import url('../assets/css/const.less');
     @import url('../assets/css/mixin');
     .blog_home {
@@ -117,10 +110,13 @@
                 height: 160px;
                 float: right;
                 margin-left: 20px;
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-size: cover;
                 cursor: pointer;
             }
             .post_title {
-                overflow: hidden;
+                display: table-cell;
                 cursor: pointer;
                 h2 {
                     font-size: 26px;
@@ -152,5 +148,41 @@
             font-size: 22px;
             text-align: center;
         }
+    }
+
+    @media screen and (max-width: 480px) {
+        .blog_home {
+            padding: 0;
+
+            .blog_post {
+                padding-top: 0;
+                padding-bottom: 20px;
+
+                .post_image {
+                    width: 100%;
+                    height: 200px;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 5px rgba(0, 0, 25, 0.1), 0 5px 75px 1px rgba(0, 0, 50, 0.2);
+                }
+
+                .post_title {
+                    padding: 15px 5px;
+
+                    h2 {
+                        font-size: 18px;
+                    }
+                    p {
+                        font-size: 12px;
+                        margin: 10px 0;
+                    }
+                }
+
+                .post_info {
+                    padding: 0;
+                    font-size: 12px;
+                }
+            }
+        }
+        
     }
 </style>

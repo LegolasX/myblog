@@ -27,7 +27,8 @@ clientConfig = Object.assign({}, baseConfig, {
         new webpack.BannerPlugin(new Date().getFullYear() + '年' + parseInt(new Date().getMonth() + 1, 10) + '月' + new Date().getDate() + '日' + new Date().getHours() + '点' + new Date().getMinutes() + '分' + '编译'),
         new webpack.DefinePlugin({
             'process.env': {
-                NODE_ENV: isProd ? '"production"' : '"development"'
+                NODE_ENV: isProd ? '"production"' : '"development"',
+                VUE_ENV: '"client"'
             }
         }),
         new webpack.optimize.CommonsChunkPlugin({

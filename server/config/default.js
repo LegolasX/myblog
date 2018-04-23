@@ -1,12 +1,12 @@
 const auth = require('./auth');
 
 module.exports = {
-    port: 3030,
+    port:  process.env.NODE_ENV === 'production' ? 3030 : 80,
     session: {
         key: 'ECIZEP_SESSIONID',
         secret: 'lovelyy',
         maxAge: 3600000,
-        domain: process.env.NODE_ENV === 'production' ? 'sunriseteam.cn' : 'ecizep.com'
+        domain: process.env.NODE_ENV === 'production' ? '140.143.164.218' : 'local.oeino.cn'
     },
     mongodb: {
         url: `mongodb://${auth.user}:${auth.password}@127.0.0.1:27017/blog`,

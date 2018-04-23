@@ -11,22 +11,21 @@
         </mu-appbar>
         <div class="setting_content">
             <mu-paper :zDepth="2" class="profile_setting">
-                
                 <div class="profile_content">
-                    <div class="profile_avatar">
-                        <img src="../../assets/images/avatar.jpg" alt="">
-                        <h3 class="profile_nickname">ECIZEP</h3>
-                        <p class="profile_signature">you will lose everything at any moment</p>
-                        <p class="profile_information">
-                            我是一个 21 岁的 homeschooler，爱好旅行以及一切富有创造性的事物，尤其是摄影、设计和编程。这个世界就是我的学校。学自己之所想所爱。自由的身心定能使我成为一个一直朝前行走的行者。
-                        </p>
+                    <div class="profile_preview" :style="{backgroundImage: user.bgUrl ? 'Url(' + user.bgUrl + ')' : ''}">
+                        <img class="profile_avatar" :src="user.avatar" alt="头像加载失败">
+                        <h3 class="profile_nickname">{{user.nickname}}</h3>
+                        <p class="profile_signature">{{user.signature}}</p>
+                        <p class="profile_information">{{user.information}}</p>
                         <div class="profile_actions">
-                            <mu-raised-button label="修改头像" @click=";" primary>
+                            <mu-raised-button label="修改头像" @click="$refs.avatar.click()" primary>
+                                <input ref="avatar" @change="inputChange($event, true)" type="file" name="avatar_file" class="upload_input">
                             </mu-raised-button>
-                            <mu-raised-button label="修改密码" @click=";" secondary>
+                            
+                            <mu-raised-button label="修改背景" @click="$refs.bg.click()" secondary>
+                                <input ref="bg" @change="inputChange($event, false)" type="file" name="bg_file" class="upload_input">
                             </mu-raised-button>
                         </div>
-                        
                     </div>
                     <div class="profile_info">
                         <div class="profile_title">
@@ -34,11 +33,11 @@
                             <P>Edit your nickname, avatar, signature, etc.</P>
                         </div>
                         <mu-text-field label="username" v-model="user.username" :full-width="true" disabled/>
-                        <mu-text-field label="nickname" :full-width="true" hintText="笔名/昵称/网名" :max-length="20" @textOverflow="textOverflow('nickname')" :errorText="usernameErrorText"/>
-                        <mu-text-field label="Signature" :full-width="true" hintText="个性签名，不超过50个字符" :max-length="50" @textOverflow="textOverflow('signature')" :errorText="signatureErrorText"/>
-                        <mu-text-field label="Personal Information" :full-width="true" hintText="个人介绍，不超过200个字符"  multiLine :rows="2" :max-length="200" error-text=""/>
-                        <mu-text-field label="Background Image Url" :full-width="true" hintText="主页背景图的Url"/>  
-                        <mu-raised-button class="button_save" label="保存" primary/>
+                        <mu-text-field label="nickname" v-model="user.nickname" :full-width="true" hintText="笔名/昵称/网名" :max-length="20" @textOverflow="textOverflow('nickname')" :errorText="usernameErrorText"/>
+                        <mu-text-field label="Signature" v-model="user.signature"  :full-width="true" hintText="个性签名，不超过50个字符" :max-length="50" @textOverflow="textOverflow('signature')" :errorText="signatureErrorText"/>
+                        <mu-text-field label="Personal Information" v-model="user.information" :full-width="true" hintText="个人介绍，不超过200个字符"  multiLine :rows="2" :max-length="200" error-text=""/>
+                        <mu-text-field label="Background Image Url" v-model="user.bgUrl" :full-width="true" hintText="主页背景图的Url"/>  
+                        <mu-raised-button class="button_save" label="保存" @click="updateProfile" primary/>
                     </div>
                 </div>
             </mu-paper>
@@ -46,6 +45,11 @@
     </div>
 </template>
 <script>
+    import {
+        getUserProfile,
+        updateUserProfile
+    } from '../../api/user.js';
+    import {uploadFile} from '../../util/qiniu';
     import muAppbar from 'muse-ui/src/appBar/index';
     import muIconButton from 'muse-ui/src/iconButton/index';
     import muFlatButton from 'muse-ui/src/flatButton/index';
@@ -56,14 +60,50 @@
     export default {
         data () {
             return {
-                user: {
-                    username: 'ecizep'
-                },
+                user: {},
                 usernameErrorText: '',
-                signatureErrorText: '',
+                signatureErrorText: ''
             }
         },
+        created () {
+            getUserProfile().then(res => {
+                if (res.data.code === 200) {
+                    this.user = res.data.data;
+                    this.user.avatar = '//static.sunriseteam.cn/' + this.user.avatar;
+                    this.user.bgUrl = '//static.sunriseteam.cn/' + this.user.bgUrl;
+                }
+            })
+        },
         methods: {
+            inputChange (event, isAvatar) {
+                let file = event.target.files[0];
+                if (isAvatar) {
+                    this.user.avatar = window.URL.createObjectURL(file);
+                } else {
+                    this.user.bgUrl = window.URL.createObjectURL(file);
+                }
+                let extName = file.name.split('.')[1];
+                let filename =  `${this.user.username}/profile/${Date.now()}.${extName}`
+                uploadFile(file, filename, {
+                    error: (res) => {
+                        console.log(res);
+                        this.$toast({
+                            message: '图片上传出错'
+                        });
+                    },
+                    complete: (res) => {
+                        this.$toast({
+                            message: '图片上传成功'
+                        });
+                        if (isAvatar) {
+                            this.user.changeAvatar = res.key;
+                        } else {
+                            this.user.changeBgUrl = res.key;
+                        }
+                        
+                    }
+                })
+            },
             textOverflow (key) {
                 if (key === 'username') {
                     this.usernameErrorText = '超过了20个字符'
@@ -72,7 +112,32 @@
                 }
             },
             goBack () {
-                this.$router.go(-1);
+                this.$router.push('dashboard');
+            },
+            updateProfile () {
+                let profile = Object.assign({}, this.user);
+                if (profile.changeAvatar) {
+                    profile.avatar = profile.changeAvatar
+                } else {
+                    delete profile.avatar;
+                }
+                if (profile.changeBgUrl) {
+                    profile.bgUrl = profile.changeBgUrl;
+                } else {
+                    delete profile.bgUrl;
+                }
+                delete profile.changeBgUrl;
+                delete profile.changeAvatar;
+                delete profile.userId;
+                delete profile.username;
+
+                updateUserProfile(this.user.username, profile).then(res => {
+                    if (res.data.code === 200) {
+                        this.$toast({
+                            message: '资料更新成功'
+                        })
+                    }
+                });
             }
         },
         components: {
@@ -86,6 +151,9 @@
     }
 </script>
 <style lang="less">
+    .upload_input {
+        display: none;
+    }
     .setting_wrapper {
         position: absolute;
         top: 0;
@@ -115,14 +183,15 @@
                 .profile_content {
                     height: 650px;
                     
-                    .profile_avatar {
+                    .profile_preview {
                         position: relative;
                         width: 400px;
                         height: 100%;
                         float: left;
                         padding: 30px 40px;
                         text-align: center;
-                        background: url('../../assets/images/05.jpg') center center no-repeat;
+                        background-position: center center;
+                        background-repeat: no-repeat;
                         background-size: cover;
                         color: white;
 
@@ -143,7 +212,13 @@
                             position: relative;
                             z-index: 1;
                         }
-
+                        .profile_bg {
+                            position: absolute;
+                            bottom: 0;
+                            right: 0;
+                            left: 0;
+                            top: 0;
+                        }
                         .profile_nickname {
                             font-size: 22px;
                             font-weight: 200;
@@ -168,7 +243,7 @@
                             bottom: 60px;
                         }
 
-                        img {
+                        .profile_avatar {
                             width: 170px;
                             height: 170px;
                             border-radius: 50%;

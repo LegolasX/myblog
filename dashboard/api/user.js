@@ -12,3 +12,11 @@ export const login = (username, password) => {
         password
     }))
 }
+
+export const getUserProfile = () => {
+    return http.get('/profile');
+}
+
+export const updateUserProfile = (username, profile) => {
+    return http.put('/profile/' + username, serializeParams(profile));
+}

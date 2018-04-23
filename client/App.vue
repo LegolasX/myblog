@@ -72,7 +72,7 @@
 
     @media screen and (max-width: 480px) {
         .blog-content {
-            padding: 40px 10px;
+            padding: 20px 10px;
         }
     }
 

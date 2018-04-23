@@ -13,6 +13,8 @@ module.exports = {
                 errorMessage: CONST.ERROR_MESSAGE_USER_EXITS
             });
         } else {
+            user.avatar = 'default/avatar.png';
+            user.bgUrl = 'default/bg.jpg';
             return MongoManager.insertOne(COLLECTION, user);
         }
     },
@@ -21,8 +23,12 @@ module.exports = {
             username
         });
     },
-    updateUserProfile (username) {
-        
+    updateUserProfile (username, user) {
+        return MongoManager.findOneAndUpdate(COLLECTION, {
+            username
+        }, {
+            $set: user
+        })
     },
     login: async function (user) {
         let doc = await MongoManager.findOne(COLLECTION, {

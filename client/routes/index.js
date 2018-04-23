@@ -9,13 +9,6 @@ export function createRouter () {
     return new VueRouter({
         mode: 'history',
         routes: [{
-            name: 'list',
-            path: '/',
-            component: list,
-            meta: {
-                title: '博客主页'
-            }
-        }, {
             name: 'blog',
             path: '/blog/:username',
             component: list,
@@ -45,7 +38,7 @@ export function createRouter () {
             }
         }, {
             path: '*',
-            redirect: '/'
+            redirect: '/blog/ecizep'
         }]
     })
 }

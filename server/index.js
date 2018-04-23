@@ -139,20 +139,21 @@ app.listen(config.port, function () {
 });
 
 
+if (isProd) {
+    let ios = express();
 
-let ios = express();
+    ios.get('/api/iosInfo', function (req, res) {
+        res.json({
+            code: 200,
+            data: {
+                shouldShow: true,
+                url: "http://140.143.164.218:3030/post/5ad40fd6825ccf3095579b44"
+            },
+            message: "success"
+        });
+    })
 
-ios.get('/api/iosInfo', function (req, res) {
-    res.json({
-        code: 200,
-        data: {
-            shouldShow: true,
-            url: "http://140.143.164.218:3030/post/5ad40fd6825ccf3095579b44"
-        },
-        message: "success"
-    });
-})
-
-ios.listen(80, function () {
-    console.log('ios running at port 80');
-})
+    ios.listen(80, function () {
+        console.log('ios running at port 80');
+    })
+}

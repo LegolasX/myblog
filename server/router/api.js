@@ -3,7 +3,7 @@ const router = express.Router();
 const posts = require('../models/posts');
 const comments = require('../models/comments');
 const categorys = require('../models/category');
-const User = require('../models/users');
+const users = require('../models/users');
 const CORS = require('../middleware/cors');
 
 const dashboardRouter = require('./dashboard');
@@ -36,7 +36,7 @@ router.get('/iOSInfo', function (req, res) {
 */
 router.post('/login', CORS, function (req, res, next) {
     console.log(req.body);
-    User.login(req.body).then((result) => {
+    users.login(req.body).then((result) => {
         if (result) {
             req.session.username = req.body.username;
             res.json({
@@ -48,6 +48,29 @@ router.post('/login', CORS, function (req, res, next) {
             res500(res);
         }
     })
+})
+
+// 个人资料
+router.get('/profile/:username', CORS, function (req, res) {
+    if (!!req.params.username) {
+        users.getUserProfile(req.params.username).then(result => {
+            if (!!result) {
+                result.userId = result._id;
+                delete result.password;
+                delete result._id;
+            } 
+            res.json({
+                code: 200,
+                data: result,
+                message: 'get user info success'
+            })
+            
+        }, reject => {
+            res500(res);
+        });
+    } else {
+        res204(res);
+    }
 })
 
 /* 

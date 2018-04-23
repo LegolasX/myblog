@@ -2,11 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import config from '../../build/config';
-
-/* import {
-    getPostList,
-    getPostById
-} from '../api/api.js' */
+import {CDN_BASE_URL} from '../util/constants';
 
 const isProd = process.env.NODE_ENV === 'production';
 let baseUrl = 'http:';
@@ -23,10 +19,14 @@ export function createStore() {
             category: null,
             post: {},
             nextPost: {},
-            BBSCommentList: []
+            BBSCommentList: [],
+            user: {}
         },
         mutations: {
             setList (state, list) {
+                list.forEach(item => {
+                    item.coverUrl = CDN_BASE_URL + item.coverUrl;
+                });
                 state.postList = list;
             },
             setCategory (state, category) {
@@ -38,38 +38,77 @@ export function createStore() {
             },
             setBBSCommentList (state, BBSCommentList) {
                 state.BBSCommentList = BBSCommentList;
+            },
+            setUser (state, user) {
+                user.bgUrl = CDN_BASE_URL + user.bgUrl;
+                user.avatar = CDN_BASE_URL + user.avatar;
+                state.user = user;
             }
         },
         actions: {
             getListOnServer ({commit}, payload) {
-                return axios.get(`${baseUrl}postList`, {
+                let listPormise = axios.get(`${baseUrl}postList`, {
                     params: {
                         username: payload.username,
                         categoryId: payload.categoryId
                     }
-                }).then(res => {
-                    if (res.data.code === 200) {
-                        console.log('server request postList success ' + payload.username + payload.categoryId);
-                        let postList = !!payload.categoryId ? res.data.data.postList : res.data.data;
-                        if (!!payload.categoryId) {
-                            postList = res.data.data.postList;
-                            commit('setCategory', res.data.data.category)
+                });
+                
+                if (payload.categoryId) {
+                    return listPormise.then(listRes => {
+                        if (listRes.data.code === 200) {
+                            console.log('server request postList success ' + payload.username + payload.categoryId);
+                            let postList = !!payload.categoryId ? listRes.data.data.postList : listRes.data.data;
+                            if (!!payload.categoryId) {
+                                postList = listRes.data.data.postList;
+                                commit('setCategory', listRes.data.data.category)
+                            } else {
+                                postList = listRes.data.data
+                            }
+                            commit('setList', postList);
+                            return axios.get(`${baseUrl}profile/${listRes.data.data.category.username}`)
                         } else {
-                            postList = res.data.data
+                            console.log('server reques postList fail: ' + payload.username + payload.categoryId);
                         }
-                        commit('setList', postList);
-                    } else {
-                        console.log('server reques postList fail: ' + payload.username + payload.categoryId);
-                    }
-                })
+                    }).then(userRes => {
+                        if (userRes.data.code === 200) {
+                            commit('setUser', userRes.data.data || {})
+                        }
+                    })
+                } else {
+                    let userPromise = axios.get(`${baseUrl}profile/${payload.username}`);
+                    return Promise.all([listPormise, userPromise]).then(([listRes, userRes]) => {
+                        if (listRes.data.code === 200) {
+                            console.log('server request postList success ' + payload.username + payload.categoryId);
+                            let postList = !!payload.categoryId ? listRes.data.data.postList : listRes.data.data;
+                            if (!!payload.categoryId) {
+                                postList = listRes.data.data.postList;
+                                commit('setCategory', listRes.data.data.category)
+                            } else {
+                                postList = listRes.data.data
+                            }
+                            commit('setList', postList);
+                        } else {
+                            console.log('server reques postList fail: ' + payload.username + payload.categoryId);
+                        }
+                        if (userRes.data.code === 200) {
+                            commit('setUser', userRes.data.data || {})
+                        }
+                    })
+                }
             },
             getPostOnServer ({commit}, postId) {
                 return axios.get(baseUrl + 'post/' + postId).then(res => {
                     if (res.data.code === 200) {
                         console.log('server requeset post success');
                         commit('setPostContent', res.data.data);
+                        return axios.get(`${baseUrl}profile/${res.data.data.post.username}`)
                     } else {
                         console.log('server requeset post fail ' + postId);
+                    }
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        commit('setUser', res.data.data);
                     }
                 })
             },
@@ -82,8 +121,13 @@ export function createStore() {
                     if (res.data.code === 200) {
                         console.log('server request bbs commentlist');
                         commit('setBBSCommentList', res.data.data);
+                        return axios.get(`${baseUrl}profile/${username}`)
                     } else {
                         console.log('server request bbs commentlist fail: ' + username);
+                    }
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        commit('setUser', res.data.data);
                     }
                 })
             }

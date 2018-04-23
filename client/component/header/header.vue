@@ -1,12 +1,16 @@
 <template>
-    <header class="blog_header">
+    <header class="blog_header"  :style="{backgroundImage: 'url('+ user.bgUrl +')'}">
         <div class="overlay"></div>
         <section class="header_intro">
-            <img class="header_avatar" src="../../assets/images/avatar.jpg" alt="">
-            <h1>ECIZEP</h1>
-            <p>you will lose everything at any moment</p>
+            <div class="header_info">
+                <img class="header_avatar" :src="user.avatar" alt="">
+                <div>
+                    <h1>{{user.nickname || '未设置'}}</h1>
+                    <p>{{user.signature || '这个人很懒，还没有个性签名'}}</p>
+                </div>
+            </div>
             <ul class="header_menu">
-                <li>
+                <li @click="gotoBlog">
                     <span class="icon-home"></span>
                 </li>
                 <li @click="gotoBBS">
@@ -16,14 +20,8 @@
                     <span :class="[isFull ? 'icon-compress' : 'icon-expand']"></span>
                 </li>
             </ul>
-            <p class="header_words">我是一个 21 岁的 homeschooler，爱好旅行以及一切富有创造性的事物，尤其是摄影、设计和编程。这个世界就是我的学校。学自己之所想所爱。自由的身心定能使我成为一个一直朝前行走的行者。</p>
-            <button type="button" class="button button_tobbs">留言</button>
-        </section>
-        <section class="header_top">
-
-        </section>
-        <section class="header_bottom">
-
+            <p class="header_words">{{user.information || '这个人很懒，还没有个人介绍'}}</p>
+            <button type="button" class="button button_tobbs" @click="gotoBBS">留言</button>
         </section>
     </header>
 </template>
@@ -34,14 +32,41 @@
                 isFull: false
             }
         },
+        computed: {
+            user: {
+                get () {
+                    return this.$store.state.user;
+                }
+            }
+        },
         methods: {
+            gotoBlog () {
+                if (this.user && this.user.username) {
+                    this.$router.push({
+                        name: 'blog',
+                        params: {
+                            username: this.user.username
+                        }
+                    });
+                } else {
+                    this.$toast({
+                        message: '缺少参数'
+                    });
+                }   
+            },
             gotoBBS () {
-                this.$router.push({
-                    name: 'bbs',
-                    params: {
-                        username: this.$route.params.username || 'ecizep'
-                    }
-                });
+                if (this.user && this.user.username) {
+                    this.$router.push({
+                        name: 'bbs',
+                        params: {
+                            username: this.user.username
+                        }
+                    });
+                } else {
+                    this.$toast({
+                        message: '缺少参数'
+                    });
+                }   
             },
             fullScreenSwitch() {
                 this.isFull = !this.isFull;
@@ -93,29 +118,16 @@
             width: 100%;
             position: relative;
             height: initial;
-            display: none;
         }
         width: 33.3%;
         position: fixed;
         height: 100%;
-        background: url('../../assets/images/05.jpg') center center no-repeat;
+        background-color: #cacaca;
+        background-position: center center;
+        background-repeat: no-repeat;
         background-size: cover;
-        box-shadow: 5px 0px 10px 8px rgba(0,
-        0,
-        0,
-        .05);
-        /* .header_top {
-            height: 60%;
-            width: 100%;
-            background: url('../../assets/images/two.jpg') center center no-repeat;
-            background-size: cover;
-            
-        }
-        .header_bottom {
-            height: 40%;
-            width: 100%;
-            background-color: white;
-        } */
+        box-shadow: 5px 0px 10px 8px rgba(0, 0, 0, .05);
+        
         .overlay {
             position: absolute;
             bottom: 0;
@@ -140,19 +152,22 @@
                 height: 120px;
                 box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7), 0px 2px 20px 3px rgba(0, 0, 0, 0.25);
             }
-            h1 {
-                padding-top: 25px;
-                font-size: 26px;
-                font-weight: 200;
-                letter-spacing: 2px;
+            .header_info {
+                h1 {
+                    padding-top: 25px;
+                    font-size: 26px;
+                    font-weight: 200;
+                    letter-spacing: 2px;
+                }
+                p {
+                    font-weight: 200;
+                    font-size: 20px;
+                    margin-top: 20px;
+                }
             }
-            p {
-                font-weight: 200;
-                font-size: 20px;
-                margin-top: 10px;
-            }
+            
             .header_menu {
-                margin: 20px 0;
+                margin-top: 20px;
                 text-align: center;
                 font-size: 0;
                 li {
@@ -180,6 +195,59 @@
             }
             .button_tobbs {
                 margin-top: 50px;
+            }
+
+            @media screen and (max-width: 960px) {
+                margin-top: 0;
+                .header_words {
+                    display: none;
+                }
+                .button_tobbs {
+                    display: none;
+                }
+                .header_avatar {
+                    width: 100px;
+                    height: 100px;
+                    vertical-align: top;
+                    margin-right: 15px;
+                }
+                .header_info {
+                    > div {
+                        display: inline-block;
+                        text-align: left;
+                        vertical-align: top;
+
+                        h1 {
+                            padding-top: 15px;
+                        }
+
+                        p {
+                            font-size: 16px;
+                        }
+                    }
+                }
+                
+            }
+
+            @media screen and (max-width: 480px) {
+                padding: 20px 10px;
+                .header_avatar {
+                    width: 70px;
+                    height: 70px;
+                }
+
+                .header_info {
+                    > div {
+                        h1 {
+                            font-size: 18px;
+                            padding-top: 10px;
+                        }
+                        p {
+                            font-size: 12px;
+                            margin-top: 5px;
+                        }
+                    }
+                }
             }
         }
     }

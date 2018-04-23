@@ -26,7 +26,7 @@
     import muRaisedButton from 'muse-ui/src/raisedButton/index';
     import {
         login
-    } from '../../api/login'
+    } from '../../api/user'
 
     export default {
         data() {
@@ -40,7 +40,6 @@
         methods: {
             login() {
                 login(this.username, this.password).then((res) => {
-                    
                     if (res.data.code === 200) {
                         if (this.$route.query.returnUrl) {
                             location.href = this.$route.query.returnUrl;

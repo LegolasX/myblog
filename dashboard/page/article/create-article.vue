@@ -13,8 +13,18 @@
             <div class="panel_cell">
                 <mu-text-field v-model="article.description"  label="文章描述" hintText="请输入文章的简要描述，不超过200个字符" multiLine :rows="3" :max-length="200" :full-width="true"/>
             </div>
-            <mu-raised-button :label="$route.query.postId ? '更新文章' : '发表文章'" @click="submitPost">
-            </mu-raised-button>
+            <div style="position: relative;">
+                <span>封面图片</span>
+                <span class="icon-plus-circle upload_rect" @click="$refs.coverPic.click()" v-if="!tempCoverUrl">
+                    <input type="file" ref="coverPic" name="coverFile" style="display:none" @change="uploadCoverPic">
+                </span>
+                <span class="cover_preview" v-else>
+                    <img :src="tempCoverUrl">
+                </span>
+                <mu-raised-button class="submit_button" :label="$route.query.postId ? '更新文章' : '发表文章'" @click="submitPost">
+                </mu-raised-button>
+            </div>
+            
         </mu-paper>
         <div class="editorContainer">
             <editor 
@@ -31,6 +41,8 @@
     import {
         http
     } from '../../util/http';
+    import {uploadFile} from '../../util/qiniu';
+    import {getUploadToken} from '../../api/photo';
     import muDatePicker from 'muse-ui/src/datePicker/index';
     import muTextField from 'muse-ui/src/textField/textField.vue';
     import muPaper from 'muse-ui/src/paper/index';
@@ -50,6 +62,9 @@
     import {
         formatDate
     } from '../../util/util.js'
+    import {
+        CDN_BASE_URL
+    } from '../../util/constants'
 
     function getDate() {
         let now = new Date();
@@ -82,8 +97,11 @@
                     description: '',
                     categoryId: '',
                     markdown: '',
-                    title: ''
+                    title: '',
+                    coverUrl: ''
                 },
+                tempCoverUrl: '',
+                username: '',
                 isPublic: true,
                 categoryList: [],
                 // 编辑器内容
@@ -98,6 +116,7 @@
                 if (res.data.code === 200) {
                     this.categoryList = res.data.data;
                     this.article.categoryId = this.categoryList[0].categoryId;
+                    this.username = this.categoryList[0].username;
                 } else {
                     this.$toast({
                         message: '获取分类列表失败，请重试'
@@ -114,12 +133,34 @@
                     this.article.title = post.title;
                     this.article.description = post.description;
                     this.article.categoryId = post.categoryId;
+                    this.article.coverUrl = post.coverUrl;
+                    this.tempCoverUrl = post.coverUrl ? CDN_BASE_URL + post.coverUrl : '';
                     this.editorContent.mdValue = post.markdown;
                     this.editorContent.htmlValue = post.content;
                 });
             }
         },
         methods: {
+            uploadCoverPic (event) {
+                let file = event.target.files[0];
+                this.tempCoverUrl = window.URL.createObjectURL(file);
+                let extName = file.name.split('.')[1];
+                let filename =  `${this.username}/profile/${Date.now()}.${extName}`;
+                uploadFile(file, filename, {
+                    error: (res) => {
+                        console.log(res);
+                        this.$toast({
+                            message: '图片上传出错'
+                        });
+                    },
+                    complete: (res) => {
+                        this.$toast({
+                            message: '图片上传成功'
+                        });
+                        this.article.coverUrl = res.key;
+                    }
+                })
+            },
             submitPost () {
                 let postParams = Object.assign({}, this.article);
                 let dateArray = postParams.date.split('-');
@@ -129,9 +170,9 @@
                 delete postParams.date;
                 delete postParams.time;
                 postParams.markdown = this.editorContent.mdValue;
-                if (!postParams.title || !postParams.markdown || !postParams.categoryId) {
+                if (!postParams.title || !postParams.markdown || !postParams.categoryId || !postParams.coverUrl) {
                     this.$toast({
-                        message: '标题，内容以及分类不能为空'
+                        message: '标题，内容, 封面图以及分类不能为空'
                     });
                     return void 666;
                 }
@@ -171,6 +212,22 @@
     }
 </script>
 <style lang="less" scope>
+    .upload_rect {
+        display: inline-block;
+        border-radius: 6px;
+        border: 1px dashed #cacaca;
+        width: 230px;
+        height: 160px;
+        font-size: 22px;
+        text-align: center;
+        line-height: 160px;
+        margin-left: 20px;
+        cursor: pointer;
+
+        &:hover {
+            border: 1px dashed #2196f3;
+        }
+    }
     .create_article {
         h2 {
             font-size: 24px;
@@ -191,6 +248,18 @@
                     left: 20px;
                     font-size: 14px;
                 }
+            }
+            
+            .cover_preview {
+                img {
+                    width: 230px;
+                    height: 160px;
+                }
+            }
+            .submit_button {
+                position: absolute;
+                right: 0;
+                bottom: 0;
             }
         }
         .editorContainer {

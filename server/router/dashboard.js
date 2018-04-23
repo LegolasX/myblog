@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
+const users = require('../models/users');
 const posts = require('../models/posts.js');
 const category = require('../models/category.js');
 const comments = require('../models/comments.js');
@@ -56,9 +57,42 @@ router.post('/upload', upload.single('cover'), function (req, res) {
     }
 })
 
-
-// 个人资料
+// 获取个人资料
 router.get('/profile', function (req, res) {
+    users.getUserProfile(req.session.username).then(result => {
+        if (!!result) {
+            result.userId = result._id;
+            delete result._id;
+            delete result.password;
+        } 
+        res.json({
+            code: 200,
+            data: result,
+            message: 'get user info success'
+        })
+        
+    }, reject => {
+        res500(res);
+    });
+})
+
+// 更新个人资料
+router.put('/profile/:username', function (req, res) {
+    if (!!req.params.username) {
+        users.updateUserProfile(req.params.username, req.body).then(result => {
+            if (result.lastErrorObject.updatedExisting && !!result.value) {
+                res.json({
+                    code: 200,
+                    message: 'update profile success',
+                    data: null
+                });
+            } else {
+                res500(res);
+            }
+        });
+    } else {
+        resLackParams(res);
+    }
     
 })
 // 创建post
@@ -166,7 +200,6 @@ router.get('/category', function (req, res) {
             result.forEach((item) => {
                 item.categoryId = item._id;
                 delete item._id;
-                delete item.username;
             })
             res.json({
                 code: 200,
