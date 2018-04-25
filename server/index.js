@@ -48,7 +48,7 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const CORS = require('./middleware/cors');
-const config = require('./config/default');
+const config = require('./config/index');
 
 // 设置模板引擎
 app.set('views', path.join(__dirname, 'views'));

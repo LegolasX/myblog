@@ -4,5 +4,5 @@ dist
 static/client
 static/dashboard
 .DS_Store
-server/config/auth.js
+server/config/index.js
 .vscode

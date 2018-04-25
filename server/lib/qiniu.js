@@ -1,5 +1,5 @@
 const qiniu = require('qiniu');
-const config = require('../config/default');
+const config = require('../config/index');
 
 let mac = new qiniu.auth.digest.Mac(config.qiniu.accessKey, config.qiniu.secretKey);
 
