@@ -1,7 +1,7 @@
 <template>
     <div class="bbs_wrapper">
         <h1>留言板</h1>
-        <p class="bbs_number">已经有人在此处留言</p>
+        <p class="bbs_number">已经有{{this.commentList.length}}人在此处留言</p>
         <comment :data-list="commentList" @comment="commentSubmit"/>
     </div>
 </template>

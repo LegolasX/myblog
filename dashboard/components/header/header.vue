@@ -2,7 +2,7 @@
         <header class="dash_header">
             <div class="user_wrapper">
                 <div class="avatar_border"></div>
-                <img :src="user.avatar" alt="" class="avatar">
+                <img :src="user.avatar | avatarUrl" alt="" class="avatar">
                 <h3>{{user.nickname || '未设置'}}</h3>
                 <p>{{user.signature || '这个人很懒，还没有个性签名'}}</p>
             </div>
@@ -65,7 +65,6 @@
         },
         created () {
             getUserProfile().then(res => {
-                res.data.data.avatar = CDN_BASE_URL + res.data.data.avatar;
                 this.user = res.data.data;
             })
         },

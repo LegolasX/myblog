@@ -12,8 +12,8 @@
         <div class="setting_content">
             <mu-paper :zDepth="2" class="profile_setting">
                 <div class="profile_content">
-                    <div class="profile_preview" :style="{backgroundImage: user.bgUrl ? 'Url(' + user.bgUrl + ')' : ''}">
-                        <img class="profile_avatar" :src="user.avatar" alt="头像加载失败">
+                    <div class="profile_preview" :style="user.bgUrl | bgStyleSlim">
+                        <img class="profile_avatar" :src="user.avatar | avatarUrl" alt="头像加载失败">
                         <h3 class="profile_nickname">{{user.nickname}}</h3>
                         <p class="profile_signature">{{user.signature}}</p>
                         <p class="profile_information">{{user.information}}</p>
@@ -36,7 +36,6 @@
                         <mu-text-field label="nickname" v-model="user.nickname" :full-width="true" hintText="笔名/昵称/网名" :max-length="20" @textOverflow="textOverflow('nickname')" :errorText="usernameErrorText"/>
                         <mu-text-field label="Signature" v-model="user.signature"  :full-width="true" hintText="个性签名，不超过50个字符" :max-length="50" @textOverflow="textOverflow('signature')" :errorText="signatureErrorText"/>
                         <mu-text-field label="Personal Information" v-model="user.information" :full-width="true" hintText="个人介绍，不超过200个字符"  multiLine :rows="2" :max-length="200" error-text=""/>
-                        <mu-text-field label="Background Image Url" v-model="user.bgUrl" :full-width="true" hintText="主页背景图的Url"/>  
                         <mu-raised-button class="button_save" label="保存" @click="updateProfile" primary/>
                     </div>
                 </div>
@@ -49,6 +48,9 @@
         getUserProfile,
         updateUserProfile
     } from '../../api/user.js';
+    import {
+        formatDate
+    } from '../../util/util';
     import {uploadFile} from '../../util/qiniu';
     import muAppbar from 'muse-ui/src/appBar/index';
     import muIconButton from 'muse-ui/src/iconButton/index';
@@ -62,39 +64,72 @@
             return {
                 user: {},
                 usernameErrorText: '',
-                signatureErrorText: ''
+                signatureErrorText: '',
+                uploadPending: false
             }
         },
         created () {
             getUserProfile().then(res => {
                 if (res.data.code === 200) {
                     this.user = res.data.data;
-                    this.user.avatar = '//static.sunriseteam.cn/' + this.user.avatar;
-                    this.user.bgUrl = '//static.sunriseteam.cn/' + this.user.bgUrl;
                 }
             })
         },
         methods: {
             inputChange (event, isAvatar) {
                 let file = event.target.files[0];
+                if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
+                    this.$toast({
+                        message: '请上传png, jpg, jpeg格式的图片'
+                    });
+                    return void 666;
+                }
+                if (file.size / 1000000 > 4) {
+                    this.$toast({
+                        message: '老铁，不要上传这么大的文件，已经超过4MB了，我的CDN流量扛不住哇',
+                        duration: 4000
+                    });
+                    return void 666;
+                }
+                let filename = this.user.username;
                 if (isAvatar) {
                     this.user.avatar = window.URL.createObjectURL(file);
+                    filename += '/profile/avatar/';
                 } else {
                     this.user.bgUrl = window.URL.createObjectURL(file);
+                    filename += '/profile/bg/';
                 }
                 let extName = file.name.split('.')[1];
-                let filename =  `${this.user.username}/profile/${Date.now()}.${extName}`
+                filename += `${formatDate(Date.now()).formatTime}.${extName}`;
+                this.$toast({
+                    message: '图片上传中，上传完成后记得保存哦'
+                });
+                this.$progress.show({
+                    size: 5
+                });
                 uploadFile(file, filename, {
                     error: (res) => {
                         console.log(res);
                         this.$toast({
                             message: '图片上传出错'
                         });
+                        this.$progress.hide();
+                    },
+                    next: (res) => {
+                        if (res.total.percent && res.total.percent !== 100) {
+                            this.$progress.show({
+                                size: 5,
+                                value: res.total.percent
+                            });
+                        } else {
+                            this.$progress.hide();
+                        }
                     },
                     complete: (res) => {
                         this.$toast({
                             message: '图片上传成功'
                         });
+                        this.$progress.hide();
                         if (isAvatar) {
                             this.user.changeAvatar = res.key;
                         } else {

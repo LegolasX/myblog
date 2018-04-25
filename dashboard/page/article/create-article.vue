@@ -15,16 +15,18 @@
             </div>
             <div style="position: relative;">
                 <span>封面图片</span>
-                <span class="icon-plus-circle upload_rect" @click="$refs.coverPic.click()" v-if="!tempCoverUrl">
+                <span class="icon-plus-circle upload_rect" @click="$refs.coverPic.click()" v-show="!tempCoverUrl">
                     <input type="file" ref="coverPic" name="coverFile" style="display:none" @change="uploadCoverPic">
                 </span>
-                <span class="cover_preview" v-else>
-                    <img :src="tempCoverUrl">
+                <span class="cover_preview" :style="tempCoverUrl | coverStyleSlim" v-show="tempCoverUrl" @click="$refs.coverPic.click()">
                 </span>
-                <mu-raised-button class="submit_button" :label="$route.query.postId ? '更新文章' : '发表文章'" @click="submitPost">
-                </mu-raised-button>
+                <div class="submit_button">
+                    <mu-raised-button label="存为草稿" @click="submitPost">
+                    </mu-raised-button>
+                    <mu-raised-button :label="$route.query.postId ? '更新文章' : '发表文章'" @click="submitPost">
+                    </mu-raised-button>
+                </div>
             </div>
-            
         </mu-paper>
         <div class="editorContainer">
             <editor 
@@ -66,26 +68,7 @@
         CDN_BASE_URL
     } from '../../util/constants'
 
-    function getDate() {
-        let now = new Date();
-        let result = {
-            year: now.getFullYear(),
-            month: now.getMonth() + 1,
-            day: now.getDate(),
-            hour: now.getHours(),
-            minute: now.getMinutes()
-        }
-        for (var key in result) {
-            if (result.hasOwnProperty(key) && result[key] < 10) {
-                result[key] = '0' + result[key].toString();
-            }
-        }
-        result.date = result.year + '-' + result.month + '-' + result.day;
-        result.time = result.hour + ':' + result.minute;
-        result.value = now.valueOf();
-        return result;
-    }
-    let dateObject = getDate();
+    let dateObject = formatDate(Date.now());
 
     export default {
         data() {
@@ -134,7 +117,7 @@
                     this.article.description = post.description;
                     this.article.categoryId = post.categoryId;
                     this.article.coverUrl = post.coverUrl;
-                    this.tempCoverUrl = post.coverUrl ? CDN_BASE_URL + post.coverUrl : '';
+                    this.tempCoverUrl = post.coverUrl;
                     this.editorContent.mdValue = post.markdown;
                     this.editorContent.htmlValue = post.content;
                 });
@@ -143,20 +126,51 @@
         methods: {
             uploadCoverPic (event) {
                 let file = event.target.files[0];
+                if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
+                    this.$toast({
+                        message: '请上传png, jpg, jpeg格式的图片'
+                    });
+                    return void 666;
+                }
+                if (file.size / 1000000 > 4) {
+                    this.$toast({
+                        message: '老铁，不要上传这么大的文件，已经超过4MB了，我的CDN流量扛不住哇',
+                        duration: 4000
+                    });
+                    return void 666;
+                }
                 this.tempCoverUrl = window.URL.createObjectURL(file);
                 let extName = file.name.split('.')[1];
-                let filename =  `${this.username}/profile/${Date.now()}.${extName}`;
+                let filename =  `${this.username}/profile/post/${Date.now()}.${extName}`;
+                this.$toast({
+                    message: '图片上传中，上传完成后记得保存哦'
+                });
+                this.$progress.show({
+                    size: 5
+                });
                 uploadFile(file, filename, {
                     error: (res) => {
                         console.log(res);
                         this.$toast({
                             message: '图片上传出错'
                         });
+                        this.$progress.hide();
+                    },
+                    next: () => {
+                        if (res.total.percent && res.total.percent !== 100) {
+                            this.$progress.show({
+                                size: 5,
+                                value: res.total.percent
+                            });
+                        } else {
+                            this.$progress.hide();
+                        }
                     },
                     complete: (res) => {
                         this.$toast({
                             message: '图片上传成功'
                         });
+                        this.$progress.hide();
                         this.article.coverUrl = res.key;
                     }
                 })
@@ -251,10 +265,15 @@
             }
             
             .cover_preview {
-                img {
-                    width: 230px;
-                    height: 160px;
-                }
+                display: inline-block;
+                width: 230px;
+                height: 160px;
+                background-position: center center;
+                background-size: cover;
+                background-repeat: no-repeat;
+                cursor: pointer;
+                vertical-align: top;
+                margin-left: 20px;
             }
             .submit_button {
                 position: absolute;

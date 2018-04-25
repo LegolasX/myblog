@@ -9,7 +9,7 @@ export function uploadFile (file, fileName, cbObject) {
     let cb = () => {
         let observable = qiniu.upload(file, fileName, uploadToken, {
             fname: file.name,
-            mineType: ["image/png", "image/jpeg", "image/jpg"]
+            mineType: ["image/png", "image/jpeg"]
         }, {
             region: qiniu.region.z0
         });

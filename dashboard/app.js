@@ -9,9 +9,18 @@ import './assets/css/reset.less';
 // 注册全局方法
 import toast from './components/toast/index';
 import confirm from './components/confirm/index';
+import progress from './components/progress/index';
 
 Vue.prototype.$toast = toast;
 Vue.prototype.$confirm = confirm;
+Vue.prototype.$progress = progress;
+
+// 全局过滤器
+import * as fliterObject from './util/fliter.js';
+
+for (let key in fliterObject) {
+    Vue.filter(key, fliterObject[key]);   
+}
 
 
 Vue.use(vueRouter);

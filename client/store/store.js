@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import config from '../../build/config';
-import {CDN_BASE_URL} from '../util/constants';
 
 const isProd = process.env.NODE_ENV === 'production';
 let baseUrl = 'http:';
@@ -24,9 +23,6 @@ export function createStore() {
         },
         mutations: {
             setList (state, list) {
-                list.forEach(item => {
-                    item.coverUrl = CDN_BASE_URL + item.coverUrl;
-                });
                 state.postList = list;
             },
             setCategory (state, category) {
@@ -40,8 +36,6 @@ export function createStore() {
                 state.BBSCommentList = BBSCommentList;
             },
             setUser (state, user) {
-                user.bgUrl = CDN_BASE_URL + user.bgUrl;
-                user.avatar = CDN_BASE_URL + user.avatar;
                 state.user = user;
             }
         },

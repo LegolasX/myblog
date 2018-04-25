@@ -1,9 +1,9 @@
 <template>
-    <header class="blog_header"  :style="{backgroundImage: 'url('+ user.bgUrl +')'}">
+    <header class="blog_header" :style="user.bgUrl | bgStyleSlim">
         <div class="overlay"></div>
         <section class="header_intro">
             <div class="header_info">
-                <img class="header_avatar" :src="user.avatar" alt="">
+                <img class="header_avatar" :src="user.avatar | avatarUrl" alt="">
                 <div>
                     <h1>{{user.nickname || '未设置'}}</h1>
                     <p>{{user.signature || '这个人很懒，还没有个性签名'}}</p>

@@ -8,6 +8,12 @@ import setTitle from './util/setTitle';
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
+// 全局过滤器
+import * as fliterObject from './util/fliter.js';
+
+for (let key in fliterObject) {
+    Vue.filter(key, fliterObject[key]);   
+}
 
 /* Vue.mixin({
     beforeMount: function () {

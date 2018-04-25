@@ -2,7 +2,6 @@
     <div class="app">
         <router-view v-if="$route.name === 'login'"></router-view>
         <div v-else>
-            <mu-linear-progress v-if="inProgress" />
             <dash-header/>
             <section class="content_wrapper">
                 <transition :name="transitionName">
@@ -14,12 +13,10 @@
 </template>
 <script>
     import dashHeader from './components/header/header.vue';
-    import muLinearProgress from 'muse-ui/src/linearProgress/index';
     
     export default {
         data() {
             return {
-                inProgress: false,
                 transitionName: 'fade'
             }
         },
@@ -36,8 +33,7 @@
 
         },
         components: {
-            dashHeader,
-            muLinearProgress
+            dashHeader
         }
     }
 </script>
@@ -48,9 +44,6 @@
         width: 100%;
         height: 100%;
 
-        .mu-linear-progress {
-            z-index: 5;
-        }
         .content_wrapper {
             padding: 40px 30px 0 380px;
             color:#68646d;

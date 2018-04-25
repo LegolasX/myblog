@@ -4,7 +4,7 @@
             分类：{{category ? category.categoryName : ''}}
         </h1>
         <article class="blog_post" v-for="post in postList" :key="post.postId">
-            <div class="post_image" :style="{backgroundImage: post.coverUrl ? 'url(' + post.coverUrl + ')' : ''}" @click="gotoPost(post.postId)"></div>
+            <div class="post_image" :style="post.coverUrl | coverStyleSlim" @click="gotoPost(post.postId)"></div>
             <div class="post_title" @click="gotoPost(post.postId)">
                 <h2>{{post.title}}</h2>
                 <p>{{post.description}}</p>
@@ -58,7 +58,6 @@
                         }
                     })
                 }
-
             }
         },
         methods: {
